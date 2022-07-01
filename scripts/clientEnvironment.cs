@@ -13,16 +13,7 @@ function Environment::setClientEnv(%this, %other)
 		%this.sun.elevation = %other.var_SunElevation;
 		%this.sun.shadowColor = %other.var_ShadowColor;
 	} else {
-		%name = %other.sun.getName();
-		%other.sun.setName("Template");
-		%this.sun = new Sun(Copy : Template).getId();
-		%this.sun.setName("");
-		%other.sun.setName(%name);
-
-		if(GhostAlwaysSet.isMember(%this.sun))
-			%this.sun.clearScopeAlways();
-
-		%this.sun.setNetFlag(6, true);
+		%this.copySunFrom(%other);
 	}
 	
 	//SUN LIGHT
@@ -32,17 +23,7 @@ function Environment::setClientEnv(%this, %other)
 		%this.sunLight.color = %other.var_SunFlareColor;
 		%this.sunLight.setFlareBitmaps ($EnvGuiServer::SunFlare[%other.var_SunFlareTopIdx],$EnvGuiServer::SunFlare[%other.var_SunFlareBottomIdx]);
 	} else {
-		%name = %other.sunLight.getName();
-		%other.sunLight.setName("Template");
-		%this.sunLight = new FxSunLight(Copy : Template).getId();
-		%this.sunLight.setName("");
-		%other.sunLight.setName(%name);
-
-		if(GhostAlwaysSet.isMember(%this.sunLight))
-			%this.sunLight.clearScopeAlways();
-
-		%this.sunLight.setNetFlag(6, true);
-		%this.sunLight.scopeToClient(%this.client);
+		%this.copySunLightFrom(%other);
 	}
 	
 	//SKY
@@ -55,17 +36,7 @@ function Environment::setClientEnv(%this, %other)
 		%this.sky.windVelocity = %other.var_WindVelocity;
 		%this.sky.windEffectPrecipitation = %other.var_WindEffectPrecipitation;
 	} else {
-		%name = %other.sky.getName();
-		%other.sky.setName("Template");
-		%this.sky = new Sky(Copy : Template).getId();
-		%this.sky.setName("");
-		%other.sky.setName(%name);
-
-		if(GhostAlwaysSet.isMember(%this.sky))
-			%this.sky.clearScopeAlways();
-
-		%this.sky.setNetFlag(6, true);
-		%this.sky.scopeToClient(%this.client);
+		%this.copySkyFrom(%other);
 	}
 
 	if(isObject(%this.groundPlane))
@@ -75,17 +46,7 @@ function Environment::setClientEnv(%this, %other)
 		%this.groundPlane.blend = getWord (%other.groundPlane.color, 3) < 255;
 		%this.groundPlane.scrollSpeed = %other.var_GroundScrollX SPC %other.var_GroundScrollY;
 	} else {
-		%name = %other.groundPlane.getName();
-		%other.groundPlane.setName("Template");
-		%this.groundPlane = new FxPlane(Copy : Template).getId();
-		%this.groundPlane.setName("");
-		%other.groundPlane.setName(%name);
-
-		if(GhostAlwaysSet.isMember(%this.groundPlane))
-			%this.groundPlane.clearScopeAlways();
-
-		%this.groundPlane.setNetFlag(6, true);
-		%this.groundPlane.scopeToClient(%this.client);
+		%this.copyGroundFrom(%other);
 	}
 
 	//does the other have a waterplane?
@@ -102,20 +63,7 @@ function Environment::setClientEnv(%this, %other)
 			//updateWaterFog() :
 			%this.sky.fogVolume1 = %other.sky.fogVolume1;
 		} else {
-			//make a copy of the waterplane
-			%name = %other.waterPlane.getName();
-			%other.waterPlane.setName("Template");
-			%this.waterPlane = new FxPlane(Copy : Template).getId();
-			%this.waterPlane.setName("");
-			%other.waterPlane.setName(%name);
-
-			if(GhostAlwaysSet.isMember(%this.waterPlane))
-				%this.waterPlane.clearScopeAlways();
-
-			%this.waterPlane.setNetFlag(6, true);
-			%this.waterPlane.scopeToClient(%this.client);
-
-			%this.sky.fogVolume1 = %other.sky.fogVolume1;
+			%this.copyWaterPlaneFrom(%other);
 		}
 	} else if(isObject(%this.waterPlane)) //delete our waterplane since other doesnt have one
 		%this.waterPlane.delete();
@@ -128,17 +76,7 @@ function Environment::setClientEnv(%this, %other)
 			%this.waterZone.appliedForce = %other.waterZone.appliedForce;
 			%this.waterZone.setWaterColor (getColorF (%other.var_UnderWaterColor));
 		} else {
-			%name = %other.waterZone.getName();
-			%other.waterZone.setName("Template");
-			%this.waterZone = new PhysicalZone(Copy : Template).getId();
-			%this.waterZone.setName("");
-			%other.waterZone.setName(%name);
-
-			if(GhostAlwaysSet.isMember(%this.waterZone))
-				%this.waterZone.clearScopeAlways();
-
-			%this.waterZone.setNetFlag(6, true);
-			%this.waterZone.scopeToClient(%this.client);
+			%this.copyWaterZoneFrom(%other);
 		}
 	} else if(isObject(%this.waterZone))
 		%this.waterZone.delete();
@@ -147,19 +85,7 @@ function Environment::setClientEnv(%this, %other)
 	%this.sky.noRenderBans = %this.sky.renderBottomTexture;
 	
 	if(!isObject(%this.dayCycle))
-	{
-		%name = %other.dayCycle.getName();
-		%other.dayCycle.setName("Template");
-		%this.dayCycle = new FxDayCycle(Copy : Template).getId();
-		%this.dayCycle.setName("");
-		%other.dayCycle.setName(%name);
-
-		if(GhostAlwaysSet.isMember(%this.dayCycle))
-			%this.dayCycle.clearScopeAlways();
-
-		%this.dayCycle.setNetFlag(6, true);
-		%this.dayCycle.scopeToClient(%this.client);
-	}
+		%this.copyDayCycleFrom(%other);
 
 	//TODO: im just gonna ignore this
 	//loadDayCycle ($EnvGuiServer::DayCycle[%other.var_DayCycleIdx]);
@@ -234,34 +160,12 @@ function Environment::setWater (%this, %other, %noUpdate)
 	//parseEnvironmentFile (%filename);
 	if(!isObject (%this.WaterPlane))
 	{
-		%name = %other.waterPlane.getName();
-		%other.waterPlane.setName("Template");
-		%this.waterPlane = new FxPlane(Copy : Template).getId();
-		%this.waterPlane.setName("");
-		%other.waterPlane.setName(%name);
-
-		if(GhostAlwaysSet.isMember(%this.waterPlane))
-			%this.waterPlane.clearScopeAlways();
-
-		%this.waterPlane.setNetFlag(6, true);
-		%this.waterPlane.scopeToClient(%this.client);
-
+		%this.copyWaterPlaneFrom(%other);
 		%createdWaterPlane = true;
 	}
 	if(!isObject (%this.WaterZone))
 	{
-		%name = %other.waterZone.getName();
-		%other.waterZone.setName("Template");
-		%this.waterZone = new PhysicalZone(Copy : Template).getId();
-		%this.waterZone.setName("");
-		%other.waterZone.setName(%name);
-
-		if(GhostAlwaysSet.isMember(%this.waterZone))
-			%this.waterZone.clearScopeAlways();
-
-		%this.waterZone.setNetFlag(6, true);
-		%this.waterZone.scopeToClient(%this.client);
-
+		%this.copyWaterZoneFrom(%other);
 		if(%createdWaterPlane)
 			return;
 
@@ -334,19 +238,7 @@ function Environment::setSkyBox (%this, %other, %noUpdate)
 
 	//dont like how rain is bound to skyboxes
 	if(isObject(%other.rain))
-	{
-		%name = %other.rain.getName();
-		%other.rain.setName("Template");
-		%this.rain = new Precipitation(Copy : Template).getId();
-		%this.rain.setName("");
-		%other.rain.setName(%name);
-
-		if(GhostAlwaysSet.isMember(%this.rain))
-			%this.rain.clearScopeAlways();
-
-		%this.rain.setNetFlag(6, true);
-		%this.rain.scopeToClient(%this.client);
-	}
+		%this.copyRainFrom(%other);
 
 	if(!%noUpdate)
 	{
@@ -362,6 +254,9 @@ function Environment::setSkyBox (%this, %other, %noUpdate)
 
 function Environment::loadDayCycle (%this, %other, %noUpdate)
 {
+	if(!isObject(%this.dayCycle))
+		%this.copyDayCycleFrom(%other);
+
 	%thisDC = %this.dayCycle;
 	%otherDC = %other.dayCycle;
 	for(%i = 0; %i < 20; %i++)
@@ -380,6 +275,149 @@ function Environment::loadDayCycle (%this, %other, %noUpdate)
 		%thisDC.sendUpdate ();
 }
 
+
+function Environment::copySkyFrom(%this, %other)
+{
+	if(!isObject(%other))
+		return;
+		
+	%name = %other.sky.getName();
+	%other.sky.setName("Template");
+	%this.sky = new Sky(Copy : Template).getId();
+	%this.sky.setName("");
+	%other.sky.setName(%name);
+
+	if(GhostAlwaysSet.isMember(%this.sky))
+		%this.sky.clearScopeAlways();
+
+	%this.sky.setNetFlag(6, true);
+	%this.sky.scopeToClient(%this.client);
+}
+
+function Environment::copySunLightFrom(%this, %other)
+{
+	if(!isObject(%other))
+		return;
+		
+	%name = %other.sunLight.getName();
+	%other.sunLight.setName("Template");
+	%this.sunLight = new FxSunLight(Copy : Template).getId();
+	%this.sunLight.setName("");
+	%other.sunLight.setName(%name);
+
+	if(GhostAlwaysSet.isMember(%this.sunLight))
+		%this.sunLight.clearScopeAlways();
+
+	%this.sunLight.setNetFlag(6, true);
+	%this.sunLight.scopeToClient(%this.client);
+}
+
+function Environment::copySunFrom(%this, %other)
+{
+	if(!isObject(%other))
+		return;
+		
+	%name = %other.sun.getName();
+	%other.sun.setName("Template");
+	%this.sun = new Sun(Copy : Template).getId();
+	%this.sun.setName("");
+	%other.sun.setName(%name);
+
+	if(GhostAlwaysSet.isMember(%this.sun))
+		%this.sun.clearScopeAlways();
+
+	%this.sun.setNetFlag(6, true);
+}
+
+function Environment::copyGroundFrom(%this, %other)
+{
+	if(!isObject(%other))
+		return;
+		
+	%name = %other.groundPlane.getName();
+	%other.groundPlane.setName("Template");
+	%this.groundPlane = new FxPlane(Copy : Template).getId();
+	%this.groundPlane.setName("");
+	%other.groundPlane.setName(%name);
+
+	if(GhostAlwaysSet.isMember(%this.groundPlane))
+		%this.groundPlane.clearScopeAlways();
+
+	%this.groundPlane.setNetFlag(6, true);
+	%this.groundPlane.scopeToClient(%this.client);
+}
+
+function Environment::copyWaterPlaneFrom(%this, %other)
+{
+	if(!isObject(%other))
+		return;
+		
+	%name = %other.waterPlane.getName();
+	%other.waterPlane.setName("Template");
+	%this.waterPlane = new FxPlane(Copy : Template).getId();
+	%this.waterPlane.setName("");
+	%other.waterPlane.setName(%name);
+
+	if(GhostAlwaysSet.isMember(%this.waterPlane))
+		%this.waterPlane.clearScopeAlways();
+
+	%this.waterPlane.setNetFlag(6, true);
+	%this.waterPlane.scopeToClient(%this.client);
+
+	%this.sky.fogVolume1 = %other.sky.fogVolume1;
+}
+function Environment::copyWaterZoneFrom(%this, %other)
+{
+	if(!isObject(%other))
+		return;
+		
+	%name = %other.waterZone.getName();
+	%other.waterZone.setName("Template");
+	%this.waterZone = new PhysicalZone(Copy : Template).getId();
+	%this.waterZone.setName("");
+	%other.waterZone.setName(%name);
+
+	if(GhostAlwaysSet.isMember(%this.waterZone))
+		%this.waterZone.clearScopeAlways();
+
+	%this.waterZone.setNetFlag(6, true);
+	%this.waterZone.scopeToClient(%this.client);
+}
+function Environment::copyDayCycleFrom(%this, %other)
+{
+	if(!isObject(%other))
+		return;
+		
+	%name = %other.dayCycle.getName();
+	%other.dayCycle.setName("Template");
+	%this.dayCycle = new FxDayCycle(Copy : Template).getId();
+	%this.dayCycle.setName("");
+	%other.dayCycle.setName(%name);
+
+	if(GhostAlwaysSet.isMember(%this.dayCycle))
+		%this.dayCycle.clearScopeAlways();
+
+	%this.dayCycle.setNetFlag(6, true);
+	%this.dayCycle.scopeToClient(%this.client);
+}
+
+function Environment::copyRainFrom(%this, %other)
+{
+	if(!isObject(%other))
+		return;
+		
+	%name = %other.rain.getName();
+	%other.rain.setName("Template");
+	%this.rain = new Precipitation(Copy : Template).getId();
+	%this.rain.setName("");
+	%other.rain.setName(%name);
+
+	if(GhostAlwaysSet.isMember(%this.rain))
+		%this.rain.clearScopeAlways();
+
+	%this.rain.setNetFlag(6, true);
+	%this.rain.scopeToClient(%this.client);
+}
 
 //returns if you should clone the object or not
 function Environment::SetVar(%this, %varName, %value, %other)
