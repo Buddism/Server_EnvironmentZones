@@ -255,9 +255,8 @@ function Environment::setSkyBox (%this, %other, %noUpdate)
 	%thisSky = %this.sky;
 	%otherSky = %other.sky;
 
-	//SKYBOX CHANGES CAUSE LAG:
-		%thisSky.materialList = %otherSky.materialList;
-	
+	//this doesnt really cause that much lag
+	%thisSky.materialList = %otherSky.materialList;
 	%thisSky.visibleDistance = %otherSky.visibleDistance;
 	%thisSky.fogDistance = %otherSky.fogDistance;
 	%thisSky.fogColor = %otherSky.fogColor;
@@ -326,7 +325,7 @@ function Environment::loadDayCycle (%this, %other, %noUpdate)
 	}
 
 	if(!%noUpdate)
-		DayCycle.sendUpdate ();
+		%thisDC.sendUpdate ();
 }
 
 
