@@ -194,6 +194,7 @@ package EnvironmentZones
 		parent::onClientEnterGame(%this);
 
 		setupDefaultEnvironment();
+		
 		%this.popAllEnvironments();
 		%this.setEnvironment($DefaultEnvironment);
 	}

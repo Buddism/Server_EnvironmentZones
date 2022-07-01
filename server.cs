@@ -22,6 +22,11 @@ if(!isFunction(NetObject, setNetFlag))
 	return;
 }
 
+function REZ()
+{
+	exec("./server.cs");
+}
+
 exec("./scripts/zone.cs");
 exec("./scripts/support.cs");
 exec("./scripts/manager.cs");
