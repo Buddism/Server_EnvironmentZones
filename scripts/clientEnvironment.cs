@@ -119,6 +119,8 @@ function Environment::setGround(%this, %other, %noUpdate)
 	if(!isObject(%other))
 		return;
 
+	%this.var_GroundIdx = %other.var_GroundIdx;
+
 	%thisGP = %this.groundPlane;
 	%otherGP = %other.groundPlane;
 
@@ -144,6 +146,8 @@ function Environment::setGround(%this, %other, %noUpdate)
 
 function Environment::setWater (%this, %other, %noUpdate)
 {
+	%this.var_WaterIdx = %other.var_WaterIdx;
+
 	if(!isObject(%other.waterPlane))
 	{
 		%this.Sky.fogVolume1 = %other.sky.fogVolume1;
@@ -201,10 +205,13 @@ function Environment::setWater (%this, %other, %noUpdate)
 
 function Environment::setSkyBox (%this, %other, %noUpdate)
 {
+	%this.var_SkyIdx = %other.var_SkyIdx;
+
 	%thisSky = %this.sky;
 	%otherSky = %other.sky;
 
 	//this doesnt really cause that much lag
+	// it depends on the skybox file
 	%thisSky.materialList = %otherSky.materialList;
 	%thisSky.visibleDistance = %otherSky.visibleDistance;
 	%thisSky.fogDistance = %otherSky.fogDistance;
