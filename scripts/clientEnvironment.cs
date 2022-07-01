@@ -68,6 +68,7 @@ function Environment::setClientEnv(%this, %other)
 	} else if(isObject(%this.waterPlane)) //delete our waterplane since other doesnt have one
 		%this.waterPlane.delete();
 	
+	//TODO: stacked physical zones are jank
 	if(isObject(%other.waterZone))
 	{
 		if(isObject (%this.waterZone))
@@ -75,7 +76,6 @@ function Environment::setClientEnv(%this, %other)
 			%this.waterZone.setTransform (%other.waterZone.getTransform());
 			//this mod has custom behaviour to waterZone scales
 			%this.waterZone.setScale (%other.waterZone.getScale());
-			talk(%other.waterZone.getScale());
 			%this.waterZone.appliedForce = %other.waterZone.appliedForce;
 			%this.waterZone.setWaterColor (getColorF (%other.var_UnderWaterColor));
 		} else {
