@@ -1,15 +1,16 @@
-function Environment::setAdvancedMode(%this, %other)
+//%other is a zone environment (template for the client zone)
+function Environment::setFrom(%this, %other)
 {
-	if(!isObject(%other))
+	if(!isObject(%other) || !%this.isClientEnv)
 		return;
 	
 	//SUN
 	if(isObject(%this.sun))
 	{
-		%this.sun.azimuth = %other.var_SunAzimuth;
-		%this.sun.elevation = %other.var_SunElevation;
-		%this.sun.color = %other.var_DirectLightColor;
 		%this.sun.ambient = %other.var_AmbientLightColor;
+		%this.sun.azimuth = %other.var_SunAzimuth;
+		%this.sun.color = %other.var_DirectLightColor;
+		%this.sun.elevation = %other.var_SunElevation;
 		%this.sun.shadowColor = %other.var_ShadowColor;
 	} else {
 		%name = %other.sun.getName();
