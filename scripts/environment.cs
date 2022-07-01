@@ -237,7 +237,6 @@ function Environment::stopEdit(%this)
 
 function Environment::nameObjects(%this)
 {
-	talk(%this SPC NAME SPC %this.test);
 	// Set all the hidden objects to be found by EnvGuiServer
 	if(isObject(%this.sky))
 		%this.sky.setName("Sky");
@@ -533,7 +532,7 @@ function Environment::restrictWaterBlock(%this)
 
 }
 
-function Environment::postEditCheck(%this)
+function Environment::postEditCheck(%this, %varType, %value)
 {
 	// Ensure we save the variables and capture new objects after every edit
 	%this.stopEdit();
@@ -544,12 +543,107 @@ function Environment::postEditCheck(%this)
 	for(%i = 0; %i < ClientGroup.getCount(); %i++)
 	{
 		%client = ClientGroup.getObject(%i);
-		if(%client.currentEnvironment == %this)
+		%clientEnv = %client.currentEnvironment;
+		if(%clientEnv.zoneEnvironment == %this)
 		{
-			%this.scopeToClient(%client);
-			talk(test);
+			if(%varType $= "delete&clone")
+			{
+				cancel(%client.EnvironmentDelaySchedule);
+				%client.EnvironmentDelaySchedule = %client.schedule(300, copyEnvironmentDelay, %this);
+			} else {
+				%returnType = %clientEnv.SetVar(%varType, %value);
+					talk("edit:" @ %varType @"="@ %value);
+					talk("	ret: " SPC %returnType);
+
+				switch$(%returnType) //which object to delete & clone
+				{
+					case "ALL":
+						cancel(%client.EnvironmentDelaySchedule);
+						%client.EnvironmentDelaySchedule = %client.schedule(100, copyEnvironmentDelay, %this);
+
+					case "DAYCYCLE":
+						if(isObject(%clientEnv.dayCycle))
+							%this.dayCycle.delete();
+
+						%name = %this.dayCycle.getName();
+						%this.dayCycle.setName("Template");
+						%clientEnv.dayCycle = new FxDayCycle(Copy : Template).getId();
+						%clientEnv.dayCycle.setName("");
+						%this.dayCycle.setName(%name);
+
+						if(GhostAlwaysSet.isMember(%clientEnv.dayCycle))
+							%clientEnv.dayCycle.clearScopeAlways();
+
+						%clientEnv.dayCycle.setNetFlag(6, 1);
+						%clientEnv.dayCycle.scopeToClient(%client);
+
+					case "SKY":
+						if(isObject(%clientEnv.sky))
+							%this.sky.delete();
+
+						%name = %this.sky.getName();
+						%this.sky.setName("Template");
+						%clientEnv.sky = new Sky(Copy : Template).getId();
+						%clientEnv.sky.setName("");
+						%this.sky.setName(%name);
+
+						if(GhostAlwaysSet.isMember(%clientEnv.sky))
+							%clientEnv.sky.clearScopeAlways();
+
+						%clientEnv.sky.setNetFlag(6, 1);
+						%clientEnv.sky.scopeToClient(%client);
+
+					case "WATER":
+						if(isObject(%clientEnv.waterPlane))
+							%this.waterPlane.delete();
+
+						%name = %this.waterPlane.getName();
+						%this.waterPlane.setName("Template");
+						%clientEnv.waterPlane = new FxPlane(Copy : Template).getId();
+						%clientEnv.waterPlane.setName("");
+						%this.waterPlane.setName(%name);
+
+						if(GhostAlwaysSet.isMember(%clientEnv.waterPlane))
+							%clientEnv.waterPlane.clearScopeAlways();
+
+						%clientEnv.waterPlane.setNetFlag(6, 1);
+						%clientEnv.waterPlane.scopeToClient(%client);
+
+					case "GROUND":
+						if(isObject(%clientEnv.groundPlane))
+							%this.groundPlane.delete();
+
+						%name = %this.groundPlane.getName();
+						%this.groundPlane.setName("Template");
+						%clientEnv.groundPlane = new FxPlane(Copy : Template).getId();
+						%clientEnv.groundPlane.setName("");
+						%this.groundPlane.setName(%name);
+
+						if(GhostAlwaysSet.isMember(%clientEnv.groundPlane))
+							%clientEnv.groundPlane.clearScopeAlways();
+
+						%clientEnv.groundPlane.setNetFlag(6, 1);
+						%clientEnv.groundPlane.scopeToClient(%client);
+
+					default:
+						//no deletions here
+				}
+			}
 		}
 	}
+}
+
+function GameConnection::copyEnvironmentDelay(%this, %environment)
+{
+	cancel(%this.EnvironmentDelaySchedule);
+	if(!isObject(%environment))
+		return;
+
+	//delete their objects so we do a straight clone instead
+	%this.currentEnvironment.deleteObjects();
+
+	//do the actual cloning
+	%this.currentEnvironment.setClientEnv(%environment);
 }
 
 function GameConnection::setEnvironment(%this, %zoneEnvironment)
@@ -597,6 +691,7 @@ function setupDefaultEnvironment()
 
 
 //%other is a zone environment (template for the client zone)
+//TODO: SUPPORT TEXTURE CHANGES (FROM SIMPLE MODE)
 function Environment::setClientEnv(%this, %other)
 {
 	if(!isObject(%other) || !%this.isClientEnv)
@@ -632,7 +727,7 @@ function Environment::setClientEnv(%this, %other)
 		%other.sunLight.setName(%name);
 	}
 	
-	//SKY: TODO SUPPORT SIMPLEMODE EX: setSkyBox
+	//SKY
 	if(isObject(%this.sky))
 	{
 		%this.sky.visibleDistance = %other.var_VisibleDistance;
@@ -653,7 +748,7 @@ function Environment::setClientEnv(%this, %other)
 	{
 		%this.groundPlane.setTransform(%other.groundPlane.getTransform());
 		%this.groundPlane.color = getColorI (%other.var_GroundColor);
-		%this.groundPlane.blend = getWord (%this.groundPlane.color, 3) < 255;
+		%this.groundPlane.blend = getWord (%other.groundPlane.color, 3) < 255;
 		%this.groundPlane.scrollSpeed = %other.var_GroundScrollX SPC %other.var_GroundScrollY;
 	} else {
 		%name = %other.groundPlane.getName();
@@ -750,4 +845,268 @@ function Environment::setClientEnv(%this, %other)
 		%this.waterPlane.sendUpdate ();
 
 	%this.groundPlane.sendUpdate ();
+}
+
+
+//returns if you should clone the object or not
+function Environment::SetVar(%this, %varName, %value)
+{
+	switch$(%varName)
+	{
+		case "SimpleMode":
+			return "ALL";
+		case "SkyIdx":
+			if (%this.var_SkyIdx !$= %value)
+				return "SKY";
+		case "WaterIdx":
+			if (%this.var_WaterIdx !$= %value)
+				return "WATER";
+		case "GroundIdx":
+			if (%this.var_GroundIdx !$= %value)
+				return "GROUND"; //setGround isnt super complicated looking
+		case "DayCycleIdx":
+			if (%this.var_DayCycleIdx !$= %value)
+				return "DAYCYCLE";
+
+		//not gonna bother with daycycle
+		case "DayOffset":
+			return "DAYCYCLE";
+
+		case "DayLength":
+			return "DAYCYCLE";
+
+		case "DayCycleEnabled":
+			return "DAYCYCLE";
+
+		case "SunFlareTopIdx":
+			if (%this.var_SunFlareTopIdx !$= %value)
+			{
+				%this.var_SunFlareTopIdx = mClamp (%value, 0, $EnvGuiServer::SunFlareCount);
+				%top = $EnvGuiServer::SunFlare[%this.var_SunFlareTopIdx];
+				%bottom = $EnvGuiServer::SunFlare[%this.var_SunFlareBottomIdx];
+				%this.SunLight.setFlareBitmaps (%top, %bottom);
+			}
+		case "SunFlareBottomIdx":
+			if (%this.var_SunFlareBottomIdx !$= %value)
+			{
+				%this.var_SunFlareBottomIdx = mClamp (%value, 0, $EnvGuiServer::SunFlareCount);
+				%top = $EnvGuiServer::SunFlare[%this.var_SunFlareTopIdx];
+				%bottom = $EnvGuiServer::SunFlare[%this.var_SunFlareBottomIdx];
+				%this.SunLight.setFlareBitmaps (%top, %bottom);
+			}
+		case "SunAzimuth":
+			if (%this.var_SunAzimuth !$= %value)
+			{
+				%this.var_SunAzimuth = mClampF (%value, 0, 360);
+				%this.Sun.azimuth = %this.var_SunAzimuth;
+				%this.Sun.sendUpdate ();
+			}
+		case "SunElevation":
+			if (%this.var_SunElevation !$= %value)
+			{
+				%this.var_SunElevation = mClampF (%value, -10, 190);
+				%this.Sun.elevation = %this.var_SunElevation;
+				%this.Sun.sendUpdate ();
+			}
+		case "DirectLightColor":
+			if (%this.var_DirectLightColor !$= %value)
+			{
+				%this.var_DirectLightColor = getColorF (%value);
+				%this.Sun.color = %this.var_DirectLightColor;
+				%this.Sun.sendUpdate ();
+			}
+		case "AmbientLightColor":
+			if (%this.var_AmbientLightColor !$= %value)
+			{
+				%this.var_AmbientLightColor = getColorF (%value);
+				%this.Sun.ambient = %this.var_AmbientLightColor;
+				%this.Sun.sendUpdate ();
+			}
+		case "ShadowColor":
+			if (%this.var_ShadowColor !$= %value)
+			{
+				%this.var_ShadowColor = getColorF (%value);
+				%this.Sun.shadowColor = %this.var_ShadowColor;
+				%this.Sun.sendUpdate ();
+			}
+		case "SunFlareColor":
+			if (%this.var_SunFlareColor !$= %value)
+			{
+				%this.var_SunFlareColor = getColorF (%value);
+				%this.SunLight.color = %this.var_SunFlareColor;
+				%this.SunLight.sendUpdate ();
+			}
+		case "SunFlareSize":
+			if (%this.var_SunFlareSize !$= %value)
+			{
+				%this.var_SunFlareSize = mClampF (%value, 0, 10);
+				%this.SunLight.FlareSize = %this.var_SunFlareSize;
+				%this.SunLight.sendUpdate ();
+			}
+		case "SunFlareIdx": //what does this even do?
+			if (%this.var_SunFlareIdx !$= %value)
+			{
+				%this.var_SunFlareIdx = mClamp (%value, 0, %this.var_SunFlareCount);
+			}
+		case "VisibleDistance":
+			if (%this.var_VisibleDistance !$= %value)
+			{
+				%this.var_VisibleDistance = mClampF (%value, 0, 1000);
+				%this.Sky.visibleDistance = %this.var_VisibleDistance;
+				%this.Sky.sendUpdate ();
+			}
+		case "FogDistance":
+			if (%this.var_FogDistance !$= %value)
+			{
+				%this.var_FogDistance = mClampF (%value, 0, 1000);
+				%this.Sky.fogDistance = %this.var_FogDistance;
+				%this.Sky.sendUpdate ();
+			}
+		case "FogHeight": //i dont think this does anything either
+			if (%this.var_FogHeight !$= %value)
+			{
+				%this.var_FogHeight = mClampF (%value, 0, 1000);
+			}
+		case "FogColor":
+			if (%this.var_FogColor !$= %value)
+			{
+				%this.var_FogColor = getColorF (%value);
+				%this.Sky.fogColor = %this.var_FogColor;
+				%this.Sky.sendUpdate ();
+			}
+		case "WaterColor":
+			if (%this.var_WaterColor !$= %value)
+			{
+				%this.var_WaterColor = getColorF (%value);
+				if (isObject (%this.WaterPlane))
+				{
+					%this.WaterPlane.color = getColorI (%this.var_WaterColor);
+					%this.WaterPlane.blend = getWord (%this.WaterPlane.color, 3) < 255;
+					%this.WaterPlane.sendUpdate ();
+					
+					%waterVis = 220 - getWord ($EnvGuiServer::WaterColor, 3) * 200;
+					%this.Sky.fogVolume1 = %waterVis SPC -10 SPC %height;
+					%this.Sky.sendUpdate ();
+				}
+			}
+		case "WaterHeight":
+			if (%this.var_WaterHeight !$= %value)
+			{
+				%this.var_WaterHeight = mClampF (%value, 0, 100);
+				if (isObject (%this.WaterPlane))
+				{
+					%pos = getWords (%this.groundPlane.getTransform (), 0, 2);
+					%pos = VectorAdd (%pos, "0 0 " @ %this.var_WaterHeight);
+					%this.WaterPlane.setTransform (%pos @ " 0 0 1 0");
+					%this.WaterPlane.sendUpdate ();
+					%height = getWord (%this.WaterPlane.getTransform (), 2);
+					%waterVis = 220 - getWord ($EnvGuiServer::WaterColor, 3) * 200;
+					%this.Sky.fogVolume1 = %waterVis SPC -10 SPC %height;
+					%this.Sky.sendUpdate ();
+				}
+				if (isObject (%this.WaterZone))
+				{
+					%pos = getWords (%this.WaterPlane.getTransform (), 0, 2);
+					%pos = VectorSub (%pos, "0 0 100");
+					%pos = VectorAdd (%pos, "0 0 0.5");
+					%pos = VectorSub (%pos, "500000 -500000 0");
+					%this.WaterZone.setTransform (%pos @ " 0 0 1 0");
+				}
+			}
+		case "UnderWaterColor":
+			if (%this.var_UnderWaterColor !$= %value)
+			{
+				%this.var_UnderWaterColor = getColorF (%value);
+				if (isObject (%this.WaterZone))
+				{
+					%this.WaterZone.setWaterColor (%this.var_UnderWaterColor);
+				}
+			}
+		case "SkyColor":
+			if (%this.var_SkyColor !$= %value)
+			{
+				%this.var_SkyColor = getColorF (%value);
+				%this.Sky.skyColor = getColorF (%this.var_SkyColor);
+				%this.Sky.sendUpdate ();
+			}
+		case "WaterScrollX":
+			if (%this.var_WaterScrollX !$= %value)
+			{
+				%this.var_WaterScrollX = %value;
+				%this.var_WaterScrollX = mClampF (%this.var_WaterScrollX, -10, 10);
+				%this.var_WaterScrollY = mClampF (%this.var_WaterScrollY, -10, 10);
+				if (isObject (%this.WaterPlane))
+				{
+					%this.WaterPlane.scrollSpeed = %this.var_WaterScrollX SPC %this.var_WaterScrollY;
+					%this.WaterPlane.sendUpdate ();
+				}
+				if (isObject (%this.WaterZone))
+				{
+					%this.WaterZone.appliedForce = %this.var_WaterScrollX * 414 SPC %this.var_WaterScrollY * -414 SPC 0;
+					%this.WaterZone.sendUpdate ();
+				}
+			}
+		case "WaterScrollY":
+			if (%this.var_WaterScrollX !$= %value)
+			{
+				%this.var_WaterScrollY = %value;
+				%this.var_WaterScrollX = mClampF (%this.var_WaterScrollX, -10, 10);
+				%this.var_WaterScrollY = mClampF (%this.var_WaterScrollY, -10, 10);
+				if (isObject (%this.WaterPlane))
+				{
+					%this.WaterPlane.scrollSpeed = %this.var_WaterScrollX SPC %this.var_WaterScrollY;
+					%this.WaterPlane.sendUpdate ();
+				}
+				if (isObject (%this.WaterZone))
+				{
+					%this.WaterZone.appliedForce = %this.var_WaterScrollX * 414 SPC %this.var_WaterScrollY * -414 SPC 0;
+					%this.WaterZone.sendUpdate ();
+				}
+			}
+		case "GroundColor":
+			if (%this.var_GroundColor !$= %value)
+			{
+				%this.var_GroundColor = getColorF (%value);
+				if (isObject (%this.groundPlane))
+				{
+					%this.groundPlane.color = getColorI (%this.var_GroundColor);
+					%this.groundPlane.blend = getWord (%this.groundPlane.color, 3) < 255;
+					%this.groundPlane.sendUpdate ();
+					%this.Sky.renderBottomTexture = getWord (%this.groundPlane.color, 3) <= 0;
+					%this.Sky.noRenderBans = %this.Sky.renderBottomTexture;
+					%this.Sky.sendUpdate ();
+				}
+			}
+		case "GroundScrollX":
+			if (%this.var_GroundScrollX !$= %value)
+			{
+				%this.var_GroundScrollX = %value;
+				%this.var_GroundScrollX = mClampF (%this.var_GroundScrollX, -10, 10);
+				%this.var_GroundScrollY = mClampF (%this.var_GroundScrollY, -10, 10);
+				%this.groundPlane.scrollSpeed = %this.var_GroundScrollX SPC %this.var_GroundScrollY;
+				%this.groundPlane.sendUpdate ();
+			}
+		case "GroundScrollY":
+			if (%this.var_GroundScrollY !$= %value)
+			{
+				%this.var_GroundScrollY = %value;
+				%this.var_GroundScrollX = mClampF (%this.var_GroundScrollX, -10, 10);
+				%this.var_GroundScrollY = mClampF (%this.var_GroundScrollY, -10, 10);
+				%this.groundPlane.scrollSpeed = %this.var_GroundScrollX SPC %this.var_GroundScrollY;
+				%this.groundPlane.sendUpdate ();
+			}
+		case "VignetteMultiply":
+			if (%this.var_VignetteMultiply !$= %value)
+			{
+				%this.var_VignetteMultiply = mClamp (%value, 0, 1);
+				EnvGuiServer::SendVignetteAll ();
+			}
+		case "VignetteColor":
+			if (%this.var_VignetteColor !$= %value)
+			{
+				%this.var_VignetteColor = getColorF (%value);
+				EnvGuiServer::SendVignetteAll ();
+			}
+	}
+	return "";
 }

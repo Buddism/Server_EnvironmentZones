@@ -256,7 +256,7 @@ package EnvironmentZones
 		parent::serverCmdEnvGui_ClickDefaults(%client);
 
 		if(%client.isAdmin)
-			%client.currentEnvironment.zoneEnvironment.postEditCheck();
+			%client.currentEnvironment.zoneEnvironment.postEditCheck("delete&clone");
 	}
 
 	// EnvGui should apply changes to the environment the client is using
@@ -268,7 +268,7 @@ package EnvironmentZones
 		parent::serverCmdEnvGui_SetVar(%client, %varName, %value);
 
 		if(%client.isAdmin)
-			%client.currentEnvironment.zoneEnvironment.postEditCheck();
+			%client.currentEnvironment.zoneEnvironment.postEditCheck(%varName, %value);
 	}
 
 	function EnvGuiServer::SendVignetteAll()
@@ -282,7 +282,8 @@ package EnvironmentZones
 		if(!isObject(%client))
 			return;
 
-		if(!isObject(%client.currentEnvironment) || %client.currentEnvironment.getId() == $CurrentEnvironment)
+
+		if(!isObject(%client.currentEnvironment) || %client.currentEnvironment.zoneEnvironment.getId() == $CurrentEnvironment)
 		{
 			if($EnvGuiServer::SimpleMode)
 				commandToClient(%client, 'setVignette', $Sky::VignetteMultiply, $Sky::VignetteColor);
@@ -291,10 +292,11 @@ package EnvironmentZones
 		}
 		else
 		{
-			if(%client.currentEnvironment.var_SimpleMode)
-				commandToClient(%client, 'setVignette', %client.currentEnvironment.simple_VignetteMultiply, %client.currentEnvironment.simple_VignetteColor);
+			%zoneEnv = %client.currentEnvironment.zoneEnvironment;
+			if(%zoneEnv.var_SimpleMode)
+				commandToClient(%client, 'setVignette', %zoneEnv.simple_VignetteMultiply, %zoneEnv.simple_VignetteColor);
 			else
-				commandToClient(%client, 'setVignette', %client.currentEnvironment.var_VignetteMultiply, %client.currentEnvironment.var_VignetteColor);
+				commandToClient(%client, 'setVignette', %zoneEnv.var_VignetteMultiply, %zoneEnv.var_VignetteColor);
 		}
 	}
 };
