@@ -67,12 +67,15 @@ function Environment::setClientEnv(%this, %other)
 		}
 	} else if(isObject(%this.waterPlane)) //delete our waterplane since other doesnt have one
 		%this.waterPlane.delete();
-
+	
 	if(isObject(%other.waterZone))
 	{
 		if(isObject (%this.waterZone))
 		{
 			%this.waterZone.setTransform (%other.waterZone.getTransform());
+			//this mod has custom behaviour to waterZone scales
+			%this.waterZone.setScale (%other.waterZone.getScale());
+			talk(%other.waterZone.getScale());
 			%this.waterZone.appliedForce = %other.waterZone.appliedForce;
 			%this.waterZone.setWaterColor (getColorF (%other.var_UnderWaterColor));
 		} else {
@@ -87,7 +90,7 @@ function Environment::setClientEnv(%this, %other)
 	if(!isObject(%this.dayCycle))
 		%this.copyDayCycleFrom(%other);
 
-	//TODO: im just gonna ignore this
+	//im just gonna ignore this (skybox handles it instead?)
 	//loadDayCycle ($EnvGuiServer::DayCycle[%other.var_DayCycleIdx]);
 
 	%this.DayCycle.setEnabled (%other.var_DayCycleEnabled);
@@ -104,6 +107,7 @@ function Environment::setClientEnv(%this, %other)
 	%this.sun.sendUpdate ();
 	%this.sunLight.sendUpdate ();
 	%this.sky.sendUpdate ();
+
 	if(isObject(%this.waterPlane))
 		%this.waterPlane.sendUpdate ();
 
@@ -181,12 +185,12 @@ function Environment::setWater (%this, %other, %noUpdate)
 
 	if(!%createdWaterPlane)
 	{
-		%thisWP.topTexture = $Water::TopTexture;
-		%thisWP.bottomTexture = $Water::BottomTexture;
-		%thisWP.loopsPerUnit = $Water::LoopsPerUnit;
-		%thisWP.scrollSpeed = $Water::ScrollSpeed;
-		%thisWP.color = $Water::Color;
-		%thisWP.colorMultiply = $Water::ColorMultiply;
+		%thisWP.topTexture = %otherWP.TopTexture;
+		%thisWP.bottomTexture = %otherWP.BottomTexture;
+		%thisWP.loopsPerUnit = %otherWP.LoopsPerUnit;
+		%thisWP.scrollSpeed = %otherWP.ScrollSpeed;
+		%thisWP.color = %otherWP.Color;
+		%thisWP.colorMultiply = %otherWP.ColorMultiply;
 		%thisWP.blend = getWord (%thisWP.color, 3) < 255;
 
 		%thisWP.setTransform (%otherWP.getTransform());
