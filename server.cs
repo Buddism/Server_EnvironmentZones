@@ -33,6 +33,8 @@ exec("./scripts/manager.cs");
 exec("./scripts/commands.cs");
 exec("./scripts/environment.cs");
 
+exec("./scripts/clientEnvironment.cs");
+
 activatePackage(EnvironmentZones);
 if(!isObject(EnvironmentZoneGroup))
 	new ScriptGroup(EnvironmentZoneGroup);

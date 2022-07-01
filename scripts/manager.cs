@@ -256,7 +256,7 @@ package EnvironmentZones
 		parent::serverCmdEnvGui_ClickDefaults(%client);
 
 		if(%client.isAdmin)
-			%client.currentEnvironment.zoneEnvironment.postEditCheck("delete&clone");
+			%client.currentEnvironment.zoneEnvironment.postEditCheck();
 	}
 
 	// EnvGui should apply changes to the environment the client is using
