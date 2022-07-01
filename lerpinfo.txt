@@ -1,0 +1,57 @@
+//important vars:
+// not: water/sky/ground textures
+//but sun flares included
+
+//LERPABLE VARIABLES:
+sun.azimuth
+sun.elevation
+sun.color
+sun.ambient
+sun.shadowColor
+
+sunLight.FlareSize
+sunLight.color
+
+
+
+Sky.visibleDistance
+Sky.fogDistance
+Sky.fogColor
+Sky.skyColor
+Sky.cloudHeight[0]
+Sky.cloudHeight[1]
+Sky.cloudHeight[2]
+Sky.cloudSpeed[0]
+Sky.cloudSpeed[1]
+Sky.cloudSpeed[2]
+
+//special handling
+Sky.windVelocity
+Sky.windEffectPrecipitation
+
+waterZone.setTransform
+waterZone.appliedForce
+waterZone.setWaterColor
+
+fxPlane.color
+fxPlane.blend
+fxPlane.scrollSpeed
+
+fxPlane.loopsPerUnit
+fxPlane.colorMultiply
+fxPlane.rayCastColor
+
+//> 50 % LERP VARS
+fxPlane.colorMultiply
+fxPlane.topTexture
+fxPlane.bottomTexture
+
+sunLight.setFlareBitmaps
+
+Sky.materialList
+sky.renderBottomTexture
+sky.noRenderBans
+
+//ignored:
+// RAIN (no sendupdate)
+// dayCycle (off until transitioned)
