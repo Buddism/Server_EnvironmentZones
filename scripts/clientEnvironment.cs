@@ -248,7 +248,7 @@ function Environment::setWater (%this, %other, %noUpdate)
 
 		%createdWaterPlane = true;
 	}
-	if(!isObject (WaterZone))
+	if(!isObject (%this.WaterZone))
 	{
 		%name = %other.waterZone.getName();
 		%other.waterZone.setName("Template");
