@@ -29,3 +29,10 @@
 %this.waterZone.setTransform (%pos @ " 0 0 1 0");
 %this.waterZone.appliedForce = %other.var_WaterScrollX * 414 SPC %other.var_WaterScrollY * -414 SPC 0;
 %this.waterZone.setWaterColor (getColorF (%other.var_UnderWaterColor));
+
+%this.groundPlane.color = getColorI (%other.var_GroundColor);
+%this.groundPlane.blend = getWord (%this.groundPlane.color, 3) < 255;
+%this.groundPlane.scrollSpeed = %other.var_GroundScrollX SPC %other.var_GroundScrollY;
+
+//%this.sky.renderBottomTexture = getWord (%this.groundPlane.color, 3) <= 0;
+//%this.sky.noRenderBans = %this.sky.renderBottomTexture;

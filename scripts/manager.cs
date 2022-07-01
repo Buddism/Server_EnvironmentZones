@@ -214,6 +214,9 @@ package EnvironmentZones
 		if(isObject(%this.envEditZone))
 			%this.envEditZone.stopEdit();
 
+		if(isObject(%this.currentEnvironment))
+			%this.currentEnvironment.delete();
+
 		parent::onClientLeaveGame(%this);
 	}
 
@@ -221,7 +224,7 @@ package EnvironmentZones
 	function serverCmdEnvGui_RequestCurrent(%client)
 	{
 		if(%client.isAdmin)
-			%client.currentEnvironment.setCurrent();
+			%client.currentEnvironment.zoneEnvironment.setCurrent();
 
 		parent::serverCmdEnvGui_RequestCurrent(%client);
 	}
@@ -230,7 +233,7 @@ package EnvironmentZones
 	function serverCmdEnvGui_RequestLists(%client)
 	{
 		if(%client.isAdmin)
-			%client.currentEnvironment.setCurrent();
+			%client.currentEnvironment.zoneEnvironment.setCurrent();
 
 		parent::serverCmdEnvGui_RequestLists(%client);
 	}
@@ -239,7 +242,7 @@ package EnvironmentZones
 	function serverCmdEnvGui_RequestCurrentVars(%client)
 	{
 		if(%client.isAdmin)
-			%client.currentEnvironment.setCurrent();
+			%client.currentEnvironment.zoneEnvironment.setCurrent();
 
 		parent::serverCmdEnvGui_RequestCurrentVars(%client);
 	}
@@ -248,24 +251,24 @@ package EnvironmentZones
 	function serverCmdEnvGui_ClickDefaults(%client)
 	{
 		if(%client.isAdmin)
-			%client.currentEnvironment.setCurrent();
+			%client.currentEnvironment.zoneEnvironment.setCurrent();
 
 		parent::serverCmdEnvGui_ClickDefaults(%client);
 
 		if(%client.isAdmin)
-			%client.currentEnvironment.postEditCheck();
+			%client.currentEnvironment.zoneEnvironment.postEditCheck();
 	}
 
 	// EnvGui should apply changes to the environment the client is using
 	function serverCmdEnvGui_SetVar(%client, %varName, %value)
 	{
 		if(%client.isAdmin)
-			%client.currentEnvironment.setCurrent();
+			%client.currentEnvironment.zoneEnvironment.setCurrent();
 
 		parent::serverCmdEnvGui_SetVar(%client, %varName, %value);
 
 		if(%client.isAdmin)
-			%client.currentEnvironment.postEditCheck();
+			%client.currentEnvironment.zoneEnvironment.postEditCheck();
 	}
 
 	function EnvGuiServer::SendVignetteAll()
