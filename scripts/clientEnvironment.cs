@@ -7,11 +7,11 @@ function Environment::setClientEnv(%this, %other)
 	//SUN
 	if(isObject(%this.sun))
 	{
-		%this.sun.ambient = %other.var_AmbientLightColor;
-		%this.sun.azimuth = %other.var_SunAzimuth;
-		%this.sun.color = %other.var_DirectLightColor;
-		%this.sun.elevation = %other.var_SunElevation;
-		%this.sun.shadowColor = %other.var_ShadowColor;
+		%this.sun.ambient 		= %other.sun.ambient;
+		%this.sun.azimuth 		= %other.sun.azimuth;
+		%this.sun.color 		= %other.sun.color;
+		%this.sun.elevation 	= %other.sun.elevation;
+		%this.sun.shadowColor 	= %other.sun.shadowColor;
 	} else {
 		%this.copySunFrom(%other);
 	}
@@ -22,6 +22,8 @@ function Environment::setClientEnv(%this, %other)
 		%this.sunLight.FlareSize = %other.var_SunFlareSize;
 		%this.sunLight.color = %other.var_SunFlareColor;
 		%this.sunLight.setFlareBitmaps ($EnvGuiServer::SunFlare[%other.var_SunFlareTopIdx],$EnvGuiServer::SunFlare[%other.var_SunFlareBottomIdx]);
+		%this.sunLight.color 	 = %other.sunLight.color;
+		%this.SunLight.setFlareBitmaps (%other.sunLight.removeFlareBitmap, %other.sunLight.localFlareBitmap);
 	} else {
 		%this.copySunLightFrom(%other);
 	}
@@ -29,12 +31,12 @@ function Environment::setClientEnv(%this, %other)
 	//SKY
 	if(isObject(%this.sky))
 	{
-		%this.sky.visibleDistance = %other.var_VisibleDistance;
-		%this.sky.fogDistance = %other.var_FogDistance;
-		%this.sky.fogColor = getColorF (%other.var_FogColor);
-		%this.sky.skyColor = getColorF (%other.var_SkyColor);
-		%this.sky.windVelocity = %other.var_WindVelocity;
-		%this.sky.windEffectPrecipitation = %other.var_WindEffectPrecipitation;
+		%this.sky.visibleDistance		  = %other.sky.visibleDistance;
+		%this.sky.fogDistance			  = %other.sky.fogDistance;
+		%this.sky.fogColor				  = %other.sky.fogColor;
+		%this.sky.skyColor				  = %other.sky.skyColor;
+		%this.sky.windVelocity			  = %other.sky.windVelocity;
+		%this.sky.windEffectPrecipitation = %other.sky.windEffectPrecipitation;
 	} else {
 		%this.copySkyFrom(%other);
 	}
@@ -42,9 +44,9 @@ function Environment::setClientEnv(%this, %other)
 	if(isObject(%this.groundPlane))
 	{
 		%this.groundPlane.setTransform(%other.groundPlane.getTransform());
-		%this.groundPlane.color = getColorI (%other.var_GroundColor);
-		%this.groundPlane.blend = getWord (%other.groundPlane.color, 3) < 255;
-		%this.groundPlane.scrollSpeed = %other.var_GroundScrollX SPC %other.var_GroundScrollY;
+		%this.groundPlane.color 	  = %other.groundPlane.color;
+		%this.groundPlane.blend 	  = %other.groundPlane.blend;
+		%this.groundPlane.scrollSpeed = %other.groundPlane.scrollSpeed;
 	} else {
 		%this.copyGroundFrom(%other);
 	}
@@ -56,9 +58,9 @@ function Environment::setClientEnv(%this, %other)
 		{
 			//update our waterplane
 			%this.waterPlane.setTransform (%other.waterPlane.getTransform());
-			%this.waterPlane.scrollSpeed = %other.waterplane.scrollSpeed;
-			%this.waterPlane.color = getColorI (%other.var_WaterColor);
-			%this.waterPlane.blend = getWord (%this.waterPlane.color, 3) < 255;
+			%this.waterPlane.scrollSpeed = %this.waterPlane.scrollSpeed;
+			%this.waterPlane.color 		 = %this.waterPlane.color;
+			%this.waterPlane.blend 		 = %this.waterPlane.blend;
 			
 			//updateWaterFog() :
 			%this.sky.fogVolume1 = %other.sky.fogVolume1;
@@ -84,8 +86,8 @@ function Environment::setClientEnv(%this, %other)
 	} else if(isObject(%this.waterZone))
 		%this.waterZone.delete();
 
-	%this.sky.renderBottomTexture = getWord (%this.groundPlane.color, 3) <= 0;
-	%this.sky.noRenderBans = %this.sky.renderBottomTexture;
+	%this.sky.renderBottomTexture	= %other.sky.renderBottomTexture;
+	%this.sky.noRenderBans			= %other.sky.noRenderBans;
 	
 	if(!isObject(%this.dayCycle))
 		%this.copyDayCycleFrom(%other);
@@ -103,6 +105,10 @@ function Environment::setClientEnv(%this, %other)
 
 	if(%this.var_WaterIdx != %other.var_WaterIdx)
 		%this.setWater(%other, %noUpdate = true);
+
+	//vars to keep track of for lerp data
+	%this.var_WaterHeight = %other.var_WaterHeight;
+	
 
 	%this.sun.sendUpdate ();
 	%this.sunLight.sendUpdate ();
