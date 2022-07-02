@@ -509,14 +509,16 @@ function Environment::restrictWaterBlock(%this)
 {
 	if(isObject(%this.waterZone) && isObject(%this.zone))
 	{
+		//height of the other WaterPlane
 		%height = getWord(%this.waterPlane.getTransform(), 2) - 0.05;
 
-		%zoneZ1 = getWord(%this.zone.point1, 2);
-		%zoneZ2 = getWord(%this.zone.point2, 2);
+		//corners of the env zone
+		%zoneZ1 = getWord(%this.zone.point1, 2); //the lowest corner
+		%zoneZ2 = getWord(%this.zone.point2, 2); //the highest corner
 
-		if(%height > %zoneZ1)
+		if(%height > %zoneZ1) //if the height is inside the zone
 		{
-			if(%height > %zoneZ2)
+			if(%height > %zoneZ2) //if the height exceeds the zone
 				%height = %zoneZ2;
 
 			%zoneScale = getWords(vectorSub(%this.zone.point2, %this.zone.point1), 0, 1);
@@ -525,12 +527,13 @@ function Environment::restrictWaterBlock(%this)
 		}
 		else
 		{
+			//the height isnt inside this zone at all: we dont need a physical zone
 			%this.waterZone.setScale("0 0 0");
 			%this.waterZone.setTransform("0 0 -1");
 		}
 	}
-
 }
+
 
 function Environment::postEditCheck(%this, %varType, %value)
 {
