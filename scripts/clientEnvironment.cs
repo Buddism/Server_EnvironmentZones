@@ -116,6 +116,9 @@ function Environment::setClientEnv(%this, %other)
 		%this.waterPlane.sendUpdate ();
 
 	%this.groundPlane.sendUpdate ();
+
+	//update the clients vignette
+	EnvGuiServer::SendVignette(%this.client);
 }
 
 //this function is thrown around a lot
