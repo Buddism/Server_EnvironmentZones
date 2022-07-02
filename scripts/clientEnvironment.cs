@@ -106,6 +106,9 @@ function Environment::setClientEnv(%this, %other)
 
 	//vars to keep track of for lerp data
 	%this.var_WaterHeight = %other.var_WaterHeight;
+
+	%this.real_vignetteColor = (%other.var_SimpleMode ? %other.simple_VignetteColor : %other.var_VignetteColor);
+	%this.real_vignetteMultiply = (%other.var_SimpleMode ? %other.simple_VignetteMultiply : %other.var_VignetteMultiply);
 	
 
 	%this.sun.sendUpdate ();

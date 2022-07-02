@@ -589,9 +589,11 @@ function GameConnection::setEnvironment(%this, %zoneEnvironment)
 		return;
 
 	%this.currentEnvironment.zoneEnvironment = %zoneEnvironment;
-	%this.currentEnvironment.setClientEnv(%zoneEnvironment);
 	%this.currentEnvironment.scopeToClient(%this);
-	EnvGuiServer::sendVignette(%this);
+
+	//%this.currentEnvironment.setClientEnv(%zoneEnvironment);
+	%this.currentEnvironment.startTransition(%zoneEnvironment, 1000);
+	//EnvGuiServer::sendVignette(%this);
 }
 
 function setupDefaultEnvironment()
