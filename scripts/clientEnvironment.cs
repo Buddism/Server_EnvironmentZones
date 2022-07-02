@@ -19,9 +19,7 @@ function Environment::setClientEnv(%this, %other)
 	//SUN LIGHT
 	if(isObject(%this.sunLight))
 	{
-		%this.sunLight.FlareSize = %other.var_SunFlareSize;
-		%this.sunLight.color = %other.var_SunFlareColor;
-		%this.sunLight.setFlareBitmaps ($EnvGuiServer::SunFlare[%other.var_SunFlareTopIdx],$EnvGuiServer::SunFlare[%other.var_SunFlareBottomIdx]);
+		%this.sunLight.FlareSize = %other.sunLight.FlareSize;
 		%this.sunLight.color 	 = %other.sunLight.color;
 		%this.SunLight.setFlareBitmaps (%other.sunLight.removeFlareBitmap, %other.sunLight.localFlareBitmap);
 	} else {
