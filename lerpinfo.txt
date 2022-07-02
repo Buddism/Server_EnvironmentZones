@@ -12,12 +12,12 @@ sun.shadowColor
 sunLight.FlareSize
 sunLight.color
 
-
-
 Sky.visibleDistance
 Sky.fogDistance
 Sky.fogColor
 Sky.skyColor
+Sky.fogVolume1
+
 Sky.cloudHeight[0]
 Sky.cloudHeight[1]
 Sky.cloudHeight[2]
