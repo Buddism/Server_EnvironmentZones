@@ -261,8 +261,8 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	//sunlight
 	if(%this.sunlightLerps > 0)
 	{
-		if(%this.LESL_FlareSize	) { %this.sunlight.FlareSize = EZ_Lerp	(%this.LSSL_FlareSize, %otherSky.FlareSize,	%lerp); }
-		if(%this.LESL_color	 	) { %this.sunlight.color	 = EZ_Lerp4f(%this.LSSL_color	 , %otherSky.color	  ,	%lerp); }
+		if(%this.LESL_FlareSize	) { %this.SunLight.FlareSize = EZ_Lerp	(%this.LSSL_FlareSize, %other.SunLight.FlareSize,	%lerp); }
+		if(%this.LESL_color	 	) { %this.SunLight.color	 = EZ_Lerp4f(%this.LSSL_color	 , %other.SunLight.color	  ,	%lerp); }
 
 		%this.sunlight.sendUpdate();
 	}
