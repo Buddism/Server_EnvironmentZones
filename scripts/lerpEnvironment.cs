@@ -43,13 +43,6 @@ function Environment::initTransition(%this, %other)
 	if( (%thisSky.windEffectPrecipitation || %otherSky.windEffectPrecipitation) )
 		%thisSky.windEffectPrecipitation = true;
 
-	// if(%thisGP.color 					!$= %otherGP.color					) {	%this.LEG_color			 = true;	%this.LSG_color			 =  %thisGP.color;					} else %this.LEG_color			 = false;
-	// if(%thisGP.blend 					!$= %otherGP.blend					) {	%this.LEG_blend			 = true;	%this.LSG_blend			 =  %thisGP.blend;					} else %this.LEG_blend			 = false;
-	// if(%thisGP.scrollSpeed 				!$= %otherGP.scrollSpeed			) {	%this.LEG_scrollSpeed	 = true;	%this.LSG_scrollSpeed	 =  %thisGP.scrollSpeed;			} else %this.LEG_scrollSpeed	 = false;
-	// if(%thisGP.loopsPerUnit 			!$= %otherGP.loopsPerUnit			) {	%this.LEG_loopsPerUnit	 = true;	%this.LSG_loopsPerUnit	 =  %thisGP.loopsPerUnit;			} else %this.LEG_loopsPerUnit	 = false;
-	// if(%thisGP.colorMultiply 			!$= %otherGP.colorMultiply			) {	%this.LEG_colorMultiply	 = true;	%this.LSG_colorMultiply	 =  %thisGP.colorMultiply;			} else %this.LEG_colorMultiply	 = false;
-	// if(%thisGP.rayCastColor 			!$= %otherGP.rayCastColor			) {	%this.LEG_rayCastColor	 = true;	%this.LSG_rayCastColor	 =  %thisGP.rayCastColor;			} else %this.LEG_rayCastColor	 = false;
-
 	//TODO: OBJECT EXISTANCE STUFF
 	if(isObject(%thisWP) && isObject(%otherWP))
 	{
@@ -72,7 +65,7 @@ function Environment::initTransition(%this, %other)
 				//need to shrink thisWP to nothing
 				%this.LEW_transform		 = true;
 				%this.LSW_transform		 = %otherWP.getPosition();
-				%this.WPLerps = 1;
+				%WPLerps = 1;
 
 				%this.LEW_color			 = false;
 				%this.LEW_scrollSpeed	 = false;
@@ -82,8 +75,7 @@ function Environment::initTransition(%this, %other)
 			} else { //%otherWP exists insteade of %thisWP
 				//need to grow thisWP (which doesnt exist yet) to otherWP
 				%this.LEW_transform		 = true;
-				%this.LSW_transform		 = "0 0 0";
-				%this.WPLerps = 1;
+				%WPLerps = 1;
 
 				%this.LEW_color			 = false;
 				%this.LEW_scrollSpeed	 = false;
@@ -105,15 +97,12 @@ function Environment::initTransition(%this, %other)
 						%startOfTransition = %zoneZ1;
 					else
 						%startOfTransition = "0 0 0";
-				}
+				} else %startOfTransition = "0 0 0";
 				//%bottomOfEnvZone
 
 				//might be a bad idea to do it from the bottom of the env zone
-				%thisWP.setTransform(%bottomOfEnvZone);
-
-
-				//flatten the zone
-				%thisWP.setScale(setWord(%thisWP.getScale(), 2, 0));
+				%thisWP.setTransform(%startOfTransition);
+				%thisWP.LSW_transform = %startOfTransition;
 			}
 		}
 	}
@@ -179,7 +168,7 @@ function Environment::initTransition(%this, %other)
 	%this.transitionGroundPlane = %otherGP;
 }
 
-function Environment::startTransition(%this, %other, %time, %start)
+function Environment::TimeTransition(%this, %other, %time, %start)
 {
 	if(!isObject(%other))
 		return;
@@ -188,6 +177,7 @@ function Environment::startTransition(%this, %other, %time, %start)
 	{
 		%start = getSimTime();
 		%this.initTransition(%other);
+		cancel(%this.transitionSchedule);
 	}
 
 	%lerp = (getSimTime() - %start) / %time;
@@ -195,7 +185,7 @@ function Environment::startTransition(%this, %other, %time, %start)
 
 	%this.client.bottomPrint(%lerp, 1, 1);
 	if(%lerp < 1)
-		%this.schedule(31, testTransition, %other, %time, %start);
+		%this.transitionSchedule = %this.schedule(31, TimeTransition, %other, %time, %start);
 }
 
 function Environment::transitionEnvironment(%this, %other, %lerp)
