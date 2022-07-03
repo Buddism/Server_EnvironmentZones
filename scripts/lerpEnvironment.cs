@@ -107,29 +107,16 @@ function Environment::initTransition(%this, %other)
 		}
 	}
 
-	//TODO: FIX THIS WITH ENV ZONES
 	if(isObject(%thisWZ) && isObject(%otherWZ))
 	{
-		if(%this.waterZone.getTransform()!$= %other.waterZone.getTransform()) { %this.LEZ_transform		 = true;	%this.LSZ_transform		= %this.waterZone.getTransform();	%WZLerps++;	 } else %this.LEZ_transform		 = false;
-		if(%this.waterZone.appliedForce	!$= %other.waterZone.appliedForce	) { %this.LEZ_appliedForce	 = true;	%this.LSZ_appliedForce	= %this.waterZone.appliedForce;		%WZLerps++;	 } else %this.LEZ_appliedForce	 = false;
 		if(%this.waterZone.waterColor	!$= %other.waterZone.waterColor		) { %this.LEZ_waterColor	 = true;	%this.LSZ_waterColor	= %this.waterZone.waterColor;		%WZLerps++;	 } else %this.LEZ_waterColor	 = false;
 	} else {
-		if(!isObject(%thisWZ) && !isObject(%otherWZ))
-		{
-			%this.LEZ_transform		= false;
-			%this.LEZ_scale			= false;
-			%this.LEZ_appliedForce	= false;
-			%this.LEZ_waterColor	= false;
-		} else {
-			if(isObject(%thisWZ))
-			{
-				//need to shrink thisWZ to nothing
-
-			} else {  //%otherWZ exists insteade of %thisWZ
-				//need to grow thisWZ (which doesnt exist yet) to otherWZ
-
-			}
-		}
+		%this.LEZ_waterColor	= false;
+		
+		if(isObject(%thisWZ))
+			%this.waterZone.delete();
+		else
+			%this.copyWaterZoneFrom(%other);
 	}
 
 	//not sure if cloudHeight is used but im adding
@@ -217,8 +204,12 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	if(%this.LE_Vignette)
 	{
 		%multiply = %lerp < 0.5 ? %this.real_vignetteMultiply : %other.real_vignetteMultiply;
-		commandToClient(%this.client, 'setVignette', %multiply, %ll = EZ_Lerp4f(%this.real_vignetteColor, %other.real_vignetteColor, %lerp));
-		centerPrintAll(%ll NL %multiply, 1);
+		%vignetteLerp = EZ_Lerp4f(%this.real_vignetteColor, %other.real_vignetteColor, %lerp);
+		commandToClient(%this.client, 'setVignette', %multiply, %vignetteLerp);
+
+		//update these vars incase we cancel a transition and change to a different environment
+		%this.real_vignetteColor = %vignetteLerp;
+		%this.real_vignetteMultiply = %multiply;
 	}
 
 	if(%this.skyLerps > 0) //we have a difference at all in sky variables
@@ -276,10 +267,8 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	//waterzone
 	if(%this.waterZoneLerps > 0)
 	{
-		//TODO: this needs special handling i think
-		//%this.LEZ_transform
-		//%this.LEZ_appliedForce
-		//%this.LEZ_waterColor
+		%this.LEZ_waterColor
+		if(%this.LEZ_waterColor		) { %thisWZ.setWaterColor(EZ_Lerp4f(%this.LSZ_waterColor	, %other.var_UnderWaterColor, %lerp)); }
 	}
 
 	//cloud
