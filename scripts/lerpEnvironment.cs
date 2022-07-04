@@ -52,70 +52,60 @@ function Environment::initTransition(%this, %other)
 		if(%thisWP.loopsPerUnit 		!$= %otherWP.loopsPerUnit			) { %this.LEW_loopsPerUnit	 = true;	%this.LSW_loopsPerUnit	 = %thisWP.loopsPerUnit;			%WPLerps++;	 } else %this.LEW_loopsPerUnit	 = false;
 		if(%thisWP.rayCastColor 		!$= %otherWP.rayCastColor			) { %this.LEW_rayCastColor	 = true;	%this.LSW_rayCastColor	 = %thisWP.rayCastColor;			%WPLerps++;	 } else %this.LEW_rayCastColor	 = false;
 	} else {
-		if(!isObject(%thisWP) && !isObject(%otherWP))
+		%this.LEW_transform		 = false;
+		%this.LEW_color			 = false;
+		%this.LEW_scrollSpeed	 = false;
+		%this.LEW_loopsPerUnit	 = false;
+		%this.LEW_rayCastColor	 = false;
+
+		if(isObject(%thisWP) && !isObject(%otherWP))
 		{
-			%this.LEW_transform		 = false;
-			%this.LEW_color			 = false;
-			%this.LEW_scrollSpeed	 = false;
-			%this.LEW_loopsPerUnit	 = false;
-			%this.LEW_rayCastColor	 = false;
-		} else {
-			if(isObject(%thisWP))
+			//need to shrink thisWP to nothing
+			%this.LEW_transform		 = true;
+			%this.LSW_transform		 = %otherWP.getPosition();
+			%WPLerps = 1;
+		} else if(isObject(%otherWP)) {
+			//need to grow thisWP (which doesnt exist yet) to otherWP
+			%this.LEW_transform		 = true;
+			%WPLerps = 1;
+
+			//create our water plane
+			%this.copyWaterPlaneFrom(%otherWP);
+			%thisWP = %this.waterPlane;
+
+			%startOfTransition = "0 0 0";
+			if(isObject(%other.zone))
 			{
-				//need to shrink thisWP to nothing
-				%this.LEW_transform		 = true;
-				%this.LSW_transform		 = %otherWP.getPosition();
-				%WPLerps = 1;
+				//height of the other WaterPlane
+				%height = getWord(%otherWP.getTransform(), 2) - 0.05;
+				%zoneZ1 = getWord(%other.zone.point1, 2); //the lowest corner
 
-				%this.LEW_color			 = false;
-				%this.LEW_scrollSpeed	 = false;
-				%this.LEW_loopsPerUnit	 = false;
-				%this.LEW_rayCastColor	 = false;
-
-			} else { //%otherWP exists insteade of %thisWP
-				//need to grow thisWP (which doesnt exist yet) to otherWP
-				%this.LEW_transform		 = true;
-				%WPLerps = 1;
-
-				%this.LEW_color			 = false;
-				%this.LEW_scrollSpeed	 = false;
-				%this.LEW_loopsPerUnit	 = false;
-				%this.LEW_rayCastColor	 = false;
-
-				//create our water plane
-				%this.copyWaterPlaneFrom(%otherWP);
-				%thisWP = %this.waterPlane;
-
-				if(isObject(%other.zone))
-				{
-					//height of the other WaterPlane
-					%height = getWord(%otherWP.getTransform(), 2) - 0.05;
-					%zoneZ1 = getWord(%other.zone.point1, 2); //the lowest corner
-
-					//if the height is inside the zone
-					if(%height > %zoneZ1)
-						%startOfTransition = %zoneZ1;
-					else
-						%startOfTransition = "0 0 0";
-				} else %startOfTransition = "0 0 0";
-				//%bottomOfEnvZone
-
-				//might be a bad idea to do it from the bottom of the env zone
-				%thisWP.setTransform(%startOfTransition);
-				%thisWP.LSW_transform = %startOfTransition;
+				//if the height is inside the zone
+				if(%height > %zoneZ1)
+					%startOfTransition = %zoneZ1;
 			}
+			//%bottomOfEnvZone
+
+			//might be a bad idea to do it from the bottom of the env zone
+			%thisWP.setTransform(%startOfTransition);
+			%thisWP.LSW_transform = %startOfTransition;
 		}
 	}
 
 	if(isObject(%thisWZ) && isObject(%otherWZ))
 	{
 		if(%this.waterZone.waterColor	!$= %other.waterZone.waterColor		) { %this.LEZ_waterColor	 = true;	%this.LSZ_waterColor	= %this.waterZone.waterColor;		%WZLerps++;	 } else %this.LEZ_waterColor	 = false;
+
+		//physicalzones overlap so im not going to bother
+		%thisWZ.setScale(%otherWZ.getScale());
+		%thisWZ.setTransform(%otherWZ.getTransform());
+		%thisWZ.appliedForce = %otherWZ.appliedForce;
 	} else {
 		%this.LEZ_waterColor	= false;
 		
-		if(isObject(%thisWZ))
+		if(isObject(%thisWZ)) //%otherWZ doesnt exist if this is true
 			%this.waterZone.delete();
-		else
+		else if(isObject(%otherWZ))
 			%this.copyWaterZoneFrom(%other);
 	}
 
@@ -134,25 +124,32 @@ function Environment::initTransition(%this, %other)
 	%this.WaterPlaneLerps = %WPLerps;
 	%this.cloudLerps = %cloudLerps;
 
-	talk("skyLerps: " @ %this.skyLerps);
-	talk("sunLerps: " @ %this.sunLerps);
-	talk("sunlightLerps: " @ %this.sunlightLerps);
-	talk("WaterZoneLerps: " @ %this.WaterZoneLerps);
-	talk("WaterPlaneLerps: " @ %this.WaterPlaneLerps);
-	talk("cloudLerps: " @ %this.cloudLerps);
-
 	%other.real_vignetteColor = (%other.var_SimpleMode ? %other.simple_VignetteColor : %other.var_VignetteColor);
 	%other.real_vignetteMultiply = (%other.var_SimpleMode ? %other.simple_VignetteMultiply : %other.var_VignetteMultiply);
 	%this.LE_Vignette = (%other.real_vignetteColor !$= %this.real_vignetteColor);
 
 	%this.LSG_opacity = getWord(%thisGP.color, 3);
 	%thisGP.blend = true;
-	%thisGP.sendUpdate();
-	if(isObject(%this.transitionGroundPlane))
-		%this.transitionGroundPlane.clearScopeToClient(%this.client);
 		
 	%otherGP.scopeToClient(%this.client);
 	%this.transitionGroundPlane = %otherGP;
+}
+
+function Environment::cancelTransition(%this, %other)
+{
+	if(!isObject(%other))
+		return;
+
+	%lastLerp = %this.lastTransitionValue;
+
+	if(isObject(%this.transitionGroundPlane))
+	{
+		%this.transitionGroundPlane.clearScopeToClient(%this.client);
+
+		%this.groundPlane.color = EZ_Lerp4f(%this.color, %other.color, %lastLerp);
+	}
+
+	%this.transitionGroundPlane = -1;
 }
 
 function Environment::TimeTransition(%this, %other, %time, %start)
@@ -162,15 +159,22 @@ function Environment::TimeTransition(%this, %other, %time, %start)
 
 	if(%start == 0)
 	{
+		if(isEventPending(%this.transitionSchedule))
+			%this.cancelTransition(%other);
+
+		if(%time == 0 || !%this.hasCreatedEnvironment)
+			return %this.setClientEnv(%other);
+
 		%start = getSimTime();
 		%this.initTransition(%other);
+
 		cancel(%this.transitionSchedule);
 	}
 
 	%lerp = (getSimTime() - %start) / %time;
 	%this.transitionEnvironment(%other, %lerp);
 
-	%this.client.bottomPrint(%lerp, 1, 1);
+	%this.client.bottomPrint(%lerp NL %this.sun.color, 1, 1);
 	if(%lerp < 1)
 		%this.transitionSchedule = %this.schedule(31, TimeTransition, %other, %time, %start);
 }

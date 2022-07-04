@@ -119,6 +119,7 @@ function Environment::setClientEnv(%this, %other)
 		%this.waterPlane.sendUpdate ();
 
 	%this.groundPlane.sendUpdate ();
+	%this.hasCreatedEnvironment = true;
 
 	//update the clients vignette
 	EnvGuiServer::SendVignette(%this.client);
@@ -299,7 +300,7 @@ function Environment::loadDayCycle (%this, %other, %noUpdate)
 
 function Environment::copySkyFrom(%this, %other)
 {
-	if(!isObject(%other))
+	if(!isObject(%other) || !isObject(%other.sky))
 		return;
 		
 	%name = %other.sky.getName();
@@ -317,7 +318,7 @@ function Environment::copySkyFrom(%this, %other)
 
 function Environment::copySunLightFrom(%this, %other)
 {
-	if(!isObject(%other))
+	if(!isObject(%other) || !isObject(%other.sunlight))
 		return;
 		
 	%name = %other.sunLight.getName();
@@ -335,7 +336,7 @@ function Environment::copySunLightFrom(%this, %other)
 
 function Environment::copySunFrom(%this, %other)
 {
-	if(!isObject(%other))
+	if(!isObject(%other) || !isObject(%other.sun))
 		return;
 		
 	%name = %other.sun.getName();
@@ -352,7 +353,7 @@ function Environment::copySunFrom(%this, %other)
 
 function Environment::copyGroundFrom(%this, %other)
 {
-	if(!isObject(%other))
+	if(!isObject(%other) || !isObject(%other.groundPlane))
 		return;
 		
 	%name = %other.groundPlane.getName();
@@ -370,7 +371,7 @@ function Environment::copyGroundFrom(%this, %other)
 
 function Environment::copyWaterPlaneFrom(%this, %other)
 {
-	if(!isObject(%other))
+	if(!isObject(%other) || !isObject(%other.waterPlane))
 		return;
 		
 	%name = %other.waterPlane.getName();
@@ -389,7 +390,7 @@ function Environment::copyWaterPlaneFrom(%this, %other)
 }
 function Environment::copyWaterZoneFrom(%this, %other)
 {
-	if(!isObject(%other))
+	if(!isObject(%other) || !isObject(%other.WaterZone))
 		return;
 		
 	%name = %other.waterZone.getName();
@@ -406,7 +407,7 @@ function Environment::copyWaterZoneFrom(%this, %other)
 }
 function Environment::copyDayCycleFrom(%this, %other)
 {
-	if(!isObject(%other))
+	if(!isObject(%other) || !isObject(%other.dayCycle))
 		return;
 		
 	%name = %other.dayCycle.getName();
@@ -424,7 +425,7 @@ function Environment::copyDayCycleFrom(%this, %other)
 
 function Environment::copyRainFrom(%this, %other)
 {
-	if(!isObject(%other))
+	if(!isObject(%other) || !isObject(%other.rain))
 		return;
 		
 	%name = %other.rain.getName();
@@ -441,6 +442,8 @@ function Environment::copyRainFrom(%this, %other)
 }
 
 //returns if you should clone the object or not
+//meant to replace serverCmdEnvGui_SetVar (%client, %varName, %value)
+//function created by Badspot, decompiled from the DSOs, then cleaned-up by Electrk (laggy webpage: https://github.com/Electrk/bl-decompiled/blob/master/server/scripts/allGameScripts.cs#L27691)
 function Environment::SetVar(%this, %varName, %value, %other)
 {
 	switch$(%varName)
