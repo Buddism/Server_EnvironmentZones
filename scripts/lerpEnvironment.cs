@@ -215,8 +215,8 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	if(%this.skyLerps > 0) //we have a difference at all in sky variables
 	{
 		//sky
-		if(%this.LES_visibleDistance) { %thisSky.visibleDistance = EZ_Lerp	(%this.LSS_visibleDistance	, %otherSky.visibleDistance , %lerp); }
-		if(%this.LES_fogDistance	) { %thisSky.fogDistance	 = EZ_Lerp	(%this.LSS_fogDistance		, %otherSky.fogDistance	 	, %lerp); }
+		if(%this.LES_visibleDistance) { %thisSky.visibleDistance = EZ_Lerp1f(%this.LSS_visibleDistance	, %otherSky.visibleDistance , %lerp); }
+		if(%this.LES_fogDistance	) { %thisSky.fogDistance	 = EZ_Lerp1f(%this.LSS_fogDistance		, %otherSky.fogDistance	 	, %lerp); }
 		if(%this.LES_fogColor		) { %thisSky.fogColor		 = EZ_Lerp4f(%this.LSS_fogColor			, %otherSky.fogColor		, %lerp); }
 		if(%this.LES_skyColor		) { %thisSky.skyColor		 = EZ_Lerp4f(%this.LSS_skyColor			, %otherSky.skyColor		, %lerp); }
 		if(%this.LES_fogVolume1		) { %thisSky.fogVolume1		 = EZ_Lerp3f(%this.LSS_fogVolume1		, %otherSky.fogVolume1		, %lerp); }
@@ -229,8 +229,8 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	//sun
 	if(%this.sunLerps > 0)
 	{
-		if(%this.LES_azimuth	) { %thisSun.azimuth	 = EZ_Lerp	(%this.LSS_azimuth	   , %otherSun.azimuth	   , %lerp); }
-		if(%this.LES_elevation	) { %thisSun.elevation	 = EZ_Lerp	(%this.LSS_elevation   , %otherSun.elevation   , %lerp); }
+		if(%this.LES_azimuth	) { %thisSun.azimuth	 = EZ_Lerp1f(%this.LSS_azimuth	   , %otherSun.azimuth	   , %lerp); }
+		if(%this.LES_elevation	) { %thisSun.elevation	 = EZ_Lerp1f(%this.LSS_elevation   , %otherSun.elevation   , %lerp); }
 		if(%this.LES_color		) { %thisSun.color		 = EZ_Lerp4f(%this.LSS_color	   , %otherSun.color	   , %lerp); }
 		if(%this.LES_ambient	) { %thisSun.ambient	 = EZ_Lerp4f(%this.LSS_ambient	   , %otherSun.ambient	   , %lerp); }
 		if(%this.LES_shadowColor) { %thisSun.shadowColor = EZ_Lerp4f(%this.LSS_shadowColor , %otherSun.shadowColor , %lerp); }
@@ -242,7 +242,7 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	//sunlight
 	if(%this.sunlightLerps > 0)
 	{
-		if(%this.LESL_FlareSize	) { %this.SunLight.FlareSize = EZ_Lerp	(%this.LSSL_FlareSize, %other.SunLight.FlareSize,	%lerp); }
+		if(%this.LESL_FlareSize	) { %this.SunLight.FlareSize = EZ_Lerp1f(%this.LSSL_FlareSize, %other.SunLight.FlareSize,	%lerp); }
 		if(%this.LESL_color	 	) { %this.SunLight.color	 = EZ_Lerp4f(%this.LSSL_color	 , %other.SunLight.color	  ,	%lerp); }
 
 		%this.sunlight.sendUpdate();
@@ -255,9 +255,9 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	{
 		if(%this.LEW_transform		) { %thisWP.setTransform  (EZ_Lerp3f(%this.LSW_transform	, %otherWP.getTransform(), %lerp)); }
 		if(%this.LEW_color			) { %thisWP.color 		 = EZ_Lerp4f(%this.LSW_color		, %otherWP.color		 , %lerp ); }
-		if(%this.LEW_scrollSpeed	) { %thisWP.scrollSpeed  = EZ_Lerp	(%this.LSW_scrollSpeed	, %otherWP.scrollSpeed	 , %lerp ); }
+		if(%this.LEW_scrollSpeed	) { %thisWP.scrollSpeed  = EZ_Lerp1f(%this.LSW_scrollSpeed	, %otherWP.scrollSpeed	 , %lerp ); }
 		if(%this.LEW_loopsPerUnit	) { %thisWP.loopsPerUnit = EZ_Lerp2f(%this.LSW_loopsPerUnit	, %otherWP.loopsPerUnit	 , %lerp ); }
-		if(%this.LEW_rayCastColor	) { %thisWP.rayCastColor = EZ_Lerp	(%this.LSW_rayCastColor	, %otherWP.rayCastColor	 , %lerp ); }
+		if(%this.LEW_rayCastColor	) { %thisWP.rayCastColor = EZ_Lerp1f(%this.LSW_rayCastColor	, %otherWP.rayCastColor	 , %lerp ); }
 
 		%thisWP.blend = getWord (%thisWP.color, 3) < 255;
 
@@ -273,12 +273,12 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	//cloud
 	if(%this.cloudLerps > 0)
 	{
-		if(%this.LE_cloudHeight[0]) { %thisSky.cloudHeight[0] = EZ_Lerp(%this.LS_cloudHeight[0], %otherSky.cloudHeight[0], %lerp); }
-		if(%this.LE_cloudHeight[1]) { %thisSky.cloudHeight[1] = EZ_Lerp(%this.LS_cloudHeight[1], %otherSky.cloudHeight[1], %lerp); }
-		if(%this.LE_cloudHeight[2]) { %thisSky.cloudHeight[2] = EZ_Lerp(%this.LS_cloudHeight[2], %otherSky.cloudHeight[2], %lerp); }
-		if(%this.LE_cloudSpeed[0] ) { %thisSky.cloudSpeed[0]  = EZ_Lerp(%this.LS_cloudSpeed[0] , %otherSky.cloudSpeed[0] , %lerp); }
-		if(%this.LE_cloudSpeed[1] ) { %thisSky.cloudSpeed[1]  = EZ_Lerp(%this.LS_cloudSpeed[1] , %otherSky.cloudSpeed[1] , %lerp); }
-		if(%this.LE_cloudSpeed[2] ) { %thisSky.cloudSpeed[2]  = EZ_Lerp(%this.LS_cloudSpeed[2] , %otherSky.cloudSpeed[2] , %lerp); }
+		if(%this.LE_cloudHeight[0]) { %thisSky.cloudHeight[0] = EZ_Lerp1f(%this.LS_cloudHeight[0], %otherSky.cloudHeight[0], %lerp); }
+		if(%this.LE_cloudHeight[1]) { %thisSky.cloudHeight[1] = EZ_Lerp1f(%this.LS_cloudHeight[1], %otherSky.cloudHeight[1], %lerp); }
+		if(%this.LE_cloudHeight[2]) { %thisSky.cloudHeight[2] = EZ_Lerp1f(%this.LS_cloudHeight[2], %otherSky.cloudHeight[2], %lerp); }
+		if(%this.LE_cloudSpeed[0] ) { %thisSky.cloudSpeed[0]  = EZ_Lerp1f(%this.LS_cloudSpeed[0] , %otherSky.cloudSpeed[0] , %lerp); }
+		if(%this.LE_cloudSpeed[1] ) { %thisSky.cloudSpeed[1]  = EZ_Lerp1f(%this.LS_cloudSpeed[1] , %otherSky.cloudSpeed[1] , %lerp); }
+		if(%this.LE_cloudSpeed[2] ) { %thisSky.cloudSpeed[2]  = EZ_Lerp1f(%this.LS_cloudSpeed[2] , %otherSky.cloudSpeed[2] , %lerp); }
 
 		%sendSkyUpdate = true;
 	}
@@ -290,7 +290,7 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	%otherGP = %other.groundPlane;
 
 	//assuming .blend is already set
-	%thisGP.color = setWord(%thisGP.color, 3, EZ_Lerp(%this.LSG_opacity, 0, %lerp));
+	%thisGP.color = setWord(%thisGP.color, 3, EZ_Lerp1f(%this.LSG_opacity, 0, %lerp));
 
 	%thisGP.sendUpdate();
 	%this.lastTransitionValue = %lerp;
