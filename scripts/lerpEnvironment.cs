@@ -267,7 +267,6 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	//waterzone
 	if(%this.waterZoneLerps > 0)
 	{
-		%this.LEZ_waterColor
 		if(%this.LEZ_waterColor		) { %thisWZ.setWaterColor(EZ_Lerp4f(%this.LSZ_waterColor	, %other.var_UnderWaterColor, %lerp)); }
 	}
 
