@@ -130,7 +130,7 @@ function Environment::initTransition(%this, %other)
 
 	%this.LSG_opacity = getWord(%thisGP.color, 3);
 	%thisGP.blend = true;
-		
+	
 	%otherGP.scopeToClient(%this.client);
 	%this.transitionGroundPlane = %otherGP;
 }
@@ -293,6 +293,7 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	%thisGP = %this.groundPlane;
 	%otherGP = %other.groundPlane;
 
+	//TODO: dont really like this method
 	//assuming .blend is already set
 	%thisGP.color = setWord(%thisGP.color, 3, EZ_Lerp1f(%this.LSG_opacity, 0, %lerp));
 

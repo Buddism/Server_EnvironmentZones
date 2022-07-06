@@ -560,6 +560,7 @@ function Environment::postEditCheck(%this, %varType, %value)
 	}
 }
 
+//not used anymore
 function GameConnection::copyEnvironmentDelay(%this, %environment)
 {
 	cancel(%this.EnvironmentDelaySchedule);
@@ -575,6 +576,13 @@ function GameConnection::copyEnvironmentDelay(%this, %environment)
 
 function GameConnection::setEnvironment(%this, %zoneEnvironment)
 {
+	//is their current environment a clientEnv and not a zoneEnv
+	if(isObject(%this.currentEnvironment) && !%this.currentEnvironment.isClientEnv)
+	{
+		%this.currentEnvironment.clearScopeToClient(%this);
+		%this.currentEnvironment = -1;
+	}
+
 	//first spawn we need to create an environment
 	if(!isObject(%this.currentEnvironment))
 	{

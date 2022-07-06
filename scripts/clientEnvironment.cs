@@ -4,14 +4,27 @@ function Environment::setClientEnv(%this, %other)
 	if(!isObject(%other) || !%this.isClientEnv)
 		return;
 	
+	%thisSun = %this.sun;
+	%otherSun = %other.sun;
+	%thisSky = %this.sky;
+	%otherSky = %other.sky;
+	%thisGP = %this.groundPlane;
+	%otherGP = %other.groundPlane;
+	%thisWP = %this.waterPlane;
+	%otherWP = %other.waterPlane;
+	%thisWZ = %this.waterZone;
+	%otherWZ = %other.waterZone;
+
 	//SUN
-	if(isObject(%this.sun))
+	if(isObject(%thisSun))
 	{
-		%this.sun.ambient 		= %other.sun.ambient;
-		%this.sun.azimuth 		= %other.sun.azimuth;
-		%this.sun.color 		= %other.sun.color;
-		%this.sun.elevation 	= %other.sun.elevation;
-		%this.sun.shadowColor 	= %other.sun.shadowColor;
+		%thisSun.ambient 	 = %otherSun.ambient;
+		%thisSun.azimuth 	 = %otherSun.azimuth;
+		%thisSun.color 		 = %otherSun.color;
+		%thisSun.elevation 	 = %otherSun.elevation;
+		%thisSun.shadowColor = %otherSun.shadowColor;
+
+		%updateSun = true;
 	} else {
 		%this.copySunFrom(%other);
 	}
@@ -22,70 +35,88 @@ function Environment::setClientEnv(%this, %other)
 		%this.sunLight.FlareSize = %other.sunLight.FlareSize;
 		%this.sunLight.color 	 = %other.sunLight.color;
 		%this.SunLight.setFlareBitmaps (%other.sunLight.removeFlareBitmap, %other.sunLight.localFlareBitmap);
+
+		%updateSunLight = true;
 	} else {
 		%this.copySunLightFrom(%other);
 	}
 	
 	//SKY
-	if(isObject(%this.sky))
+	if(isObject(%thisSky))
 	{
-		%this.sky.visibleDistance		  = %other.sky.visibleDistance;
-		%this.sky.fogDistance			  = %other.sky.fogDistance;
-		%this.sky.fogColor				  = %other.sky.fogColor;
-		%this.sky.skyColor				  = %other.sky.skyColor;
-		%this.sky.windVelocity			  = %other.sky.windVelocity;
-		%this.sky.windEffectPrecipitation = %other.sky.windEffectPrecipitation;
+		%thisSky.visibleDistance		  = %otherSky.visibleDistance;
+		%thisSky.fogDistance			  = %otherSky.fogDistance;
+		%thisSky.fogColor				  = %otherSky.fogColor;
+		%thisSky.skyColor				  = %otherSky.skyColor;
+		%thisSky.windVelocity			  = %otherSky.windVelocity;
+		%thisSky.windEffectPrecipitation  = %otherSky.windEffectPrecipitation;
+
+		%updateSky = true;
 	} else {
 		%this.copySkyFrom(%other);
 	}
 
-	if(isObject(%this.groundPlane))
+	if(isObject(%thisGP))
 	{
-		%this.groundPlane.setTransform(%other.groundPlane.getTransform());
-		%this.groundPlane.color 	  = %other.groundPlane.color;
-		%this.groundPlane.blend 	  = %other.groundPlane.blend;
-		%this.groundPlane.scrollSpeed = %other.groundPlane.scrollSpeed;
+		%thisGP.setTransform(%otherGP.getTransform());
+		%thisGP.color 		= %otherGP.color;
+		%thisGP.blend 	 	= %otherGP.blend;
+		%thisGP.scrollSpeed = %otherGP.scrollSpeed;
+
+		%updateGround = true;
 	} else {
 		%this.copyGroundFrom(%other);
 	}
 
 	//does the other have a waterplane?
-	if(isObject(%other.waterPlane))
+	if(isObject(%otherWP))
 	{
-		if(isObject (%this.waterPlane))
+		if(isObject (%thisWP))
 		{
 			//update our waterplane
-			%this.waterPlane.setTransform (%other.waterPlane.getTransform());
-			%this.waterPlane.scrollSpeed = %this.waterPlane.scrollSpeed;
-			%this.waterPlane.color 		 = %this.waterPlane.color;
-			%this.waterPlane.blend 		 = %this.waterPlane.blend;
-			
-			//updateWaterFog() :
-			%this.sky.fogVolume1 = %other.sky.fogVolume1;
+			%thisWP.setTransform (%otherWP.getTransform());
+			%thisWP.scrollSpeed	 = %thisWP.scrollSpeed;
+			%thisWP.color 		 = %thisWP.color;
+			%thisWP.blend 		 = %thisWP.blend;
+		
+			%thisSky.fogVolume1  = %otherSky.fogVolume1;
+
+			%updateSky = true;
+			%updateWP = true;
 		} else {
 			%this.copyWaterPlaneFrom(%other);
 		}
-	} else if(isObject(%this.waterPlane)) //delete our waterplane since other doesnt have one
-		%this.waterPlane.delete();
+	} else if(isObject(%thisWP)) //delete our waterplane since other doesnt have one
+		%thisWP.delete();
 	
 	//TODO: stacked physical zones are jank
-	if(isObject(%other.waterZone))
+	if(isObject(%otherWZ))
 	{
-		if(isObject (%this.waterZone))
+		if(isObject (%thisWZ))
 		{
-			%this.waterZone.setTransform (%other.waterZone.getTransform());
+			%thisWZ.setTransform (%otherWZ.getTransform());
 			//this mod has custom behaviour to waterZone scales
-			%this.waterZone.setScale (%other.waterZone.getScale());
-			%this.waterZone.appliedForce = %other.waterZone.appliedForce;
-			%this.waterZone.setWaterColor (getColorF (%other.var_UnderWaterColor));
+			%thisWZ.setScale (%otherWZ.getScale());
+			%thisWZ.appliedForce = %otherWZ.appliedForce;
+			%thisWZ.setWaterColor (getColorF (%other.var_UnderWaterColor));
+
+			%updateWZ = true;
 		} else {
 			%this.copyWaterZoneFrom(%other);
 		}
-	} else if(isObject(%this.waterZone))
-		%this.waterZone.delete();
+	} else if(isObject(%thisWZ))
+		%thisWZ.delete();
 
-	%this.sky.renderBottomTexture	= %other.sky.renderBottomTexture;
-	%this.sky.noRenderBans			= %other.sky.noRenderBans;
+	if(%thisSky.renderBottomTexture	!= %otherSky.renderBottomTexture)
+	{
+		%thisSky.renderBottomTexture = %otherSky.renderBottomTexture;
+		%updateSky = true;
+	}
+	if(%thisSky.noRenderBan != %otherSky.noRenderBans)
+	{
+		%thisSky.noRenderBans			= %otherSky.noRenderBans;
+		%updateSky = true;
+	}
 	
 	if(!isObject(%this.dayCycle))
 		%this.copyDayCycleFrom(%other);
@@ -110,15 +141,13 @@ function Environment::setClientEnv(%this, %other)
 	%this.real_vignetteColor = (%other.var_SimpleMode ? %other.simple_VignetteColor : %other.var_VignetteColor);
 	%this.real_vignetteMultiply = (%other.var_SimpleMode ? %other.simple_VignetteMultiply : %other.var_VignetteMultiply);
 	
+	if(%updateSun		) %thisSun.sendUpdate();
+	if(%updateSunLight	) %thisSunLight.sendUpdate();
+	if(%updateSky		) %thisSky.sendUpdate();
+	if(%updateGround	) %thisGP.sendUpdate();
+	if(%updateWP		) %thisWP.sendUpdate();
+	if(%updateWZ		) %thisWZ.sendUpdate();
 
-	%this.sun.sendUpdate ();
-	%this.sunLight.sendUpdate ();
-	%this.sky.sendUpdate ();
-
-	if(isObject(%this.waterPlane))
-		%this.waterPlane.sendUpdate ();
-
-	%this.groundPlane.sendUpdate ();
 	%this.hasCreatedEnvironment = true;
 
 	//update the clients vignette
