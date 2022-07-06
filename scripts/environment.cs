@@ -542,6 +542,8 @@ function Environment::postEditCheck(%this, %varType, %value)
 	%this.setupNetFlags();
 	%this.startEdit();
 
+	talk(%this);
+
 	// If new objects were added we have to ghost them to clients currently using this environment
 	for(%i = 0; %i < ClientGroup.getCount(); %i++)
 	{
@@ -597,7 +599,7 @@ function GameConnection::setEnvironment(%this, %zoneEnvironment)
 		return;
 
 	%this.currentEnvironment.zoneEnvironment = %zoneEnvironment;
-	
+
 	//%this.currentEnvironment.setClientEnv(%zoneEnvironment);
 	%this.currentEnvironment.TimeTransition(%zoneEnvironment, 1000);
 	%this.currentEnvironment.scopeToClient(%this);

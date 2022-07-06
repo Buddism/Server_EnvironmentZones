@@ -265,6 +265,11 @@ package EnvironmentZones
 		if(%client.isAdmin)
 			%client.currentEnvironment.zoneEnvironment.setCurrent();
 
+		//fix for envGui::clickRandom
+		//for some reason the transparency value for getRandomColorFOpaque is 255
+		if(%varName $= "GroundColor" && getWord(%value, 3) == 255)
+			%value = setWord(%value, 3, 1);
+
 		parent::serverCmdEnvGui_SetVar(%client, %varName, %value);
 
 		if(%client.isAdmin)

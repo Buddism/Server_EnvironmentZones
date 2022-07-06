@@ -702,7 +702,7 @@ function Environment::SetVar(%this, %varName, %value, %other)
 		case "GroundColor":
 			if(%this.var_GroundColor !$= %value)
 			{
-				%this.var_GroundColor = getColorF (%value);
+				%this.var_GroundColor = getColorF(%value);
 				if(isObject (%this.groundPlane))
 				{
 					%this.groundPlane.color = getColorI (%this.var_GroundColor);
