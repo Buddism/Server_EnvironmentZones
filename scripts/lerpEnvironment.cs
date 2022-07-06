@@ -33,15 +33,21 @@ function Environment::initTransition(%this, %other)
 	if(%this.sunLight.color				!$= %other.sunLight.color			) { %this.LESL_color	 	 = true;	%this.LSSL_color	 	 =	%this.sunLight.color; 			%sunLight++; } else %this.LESL_color	 	 = false;
 
 	//sky
-	if(%thisSky.visibleDistance			!$=	%otherSky.visibleDistance		) {	%this.LES_visibleDistance = true;	%this.LSS_visibleDistance =	%thisSky.visibleDistance;		%skyLerps++; } else %this.LES_visibleDistance = false;
+	if(%thisSky.visibleDistance			!$=	%otherSky.visibleDistance		) {	%this.LES_visibleDistance = true;	%this.LSS_visibleDistance=	%thisSky.visibleDistance;		%skyLerps++; } else %this.LES_visibleDistance= false;
 	if(%thisSky.fogDistance				!$=	%otherSky.fogDistance			) {	%this.LES_fogDistance	 = true;	%this.LSS_fogDistance	 =	%thisSky.fogDistance;			%skyLerps++; } else %this.LES_fogDistance	 = false;
 	if(%thisSky.fogColor				!$=	%otherSky.fogColor				) {	%this.LES_fogColor		 = true;	%this.LSS_fogColor		 =	%thisSky.fogColor;				%skyLerps++; } else %this.LES_fogColor		 = false;
 	if(%thisSky.skyColor				!$=	%otherSky.skyColor				) {	%this.LES_skyColor		 = true;	%this.LSS_skyColor		 =	%thisSky.skyColor;				%skyLerps++; } else %this.LES_skyColor		 = false;
-	if(%thisSky.fogVolume1				!$=	%otherSky.fogVolume1			) {	%this.LES_fogVolume1	 = true;	%this.LSS_fogVolume1	 =	%thisSky.fogVolume1;			%skyLerps++; } else %this.LES_fogVolume1		 = false;
+	if(%thisSky.fogVolume1				!$=	%otherSky.fogVolume1			) {	%this.LES_fogVolume1	 = true;	%this.LSS_fogVolume1	 =	%thisSky.fogVolume1;			%skyLerps++; } else %this.LES_fogVolume1	 = false;
 	if(%thisSky.windVelocity 			!$= %otherSky.windVelocity			) {	%this.LES_windVelocity	 = true;	%this.LSS_windVelocity	 =	%thisSky.windVelocity;			%skyLerps++; } else %this.LES_windVelocity	 = false;
 
 	if( (%thisSky.windEffectPrecipitation || %otherSky.windEffectPrecipitation) )
 		%thisSky.windEffectPrecipitation = true;
+
+	if(%thisGP.color 					!$= %otherGP.color					) {	%this.LEG_color			 = true;	%this.LSG_color			 =  %thisGP.color;					%GPLerps++;	 } else %this.LEG_color			 = false;
+	if(%thisGP.scrollSpeed 				!$= %otherGP.scrollSpeed			) {	%this.LEG_scrollSpeed	 = true;	%this.LSG_scrollSpeed	 =  %thisGP.scrollSpeed;			%GPLerps++;	 } else %this.LEG_scrollSpeed	 = false;
+	if(%thisGP.loopsPerUnit 			!$= %otherGP.loopsPerUnit			) {	%this.LEG_loopsPerUnit	 = true;	%this.LSG_loopsPerUnit	 =  %thisGP.loopsPerUnit;			%GPLerps++;	 } else %this.LEG_loopsPerUnit	 = false;
+	if(%thisGP.rayCastColor 			!$= %otherGP.rayCastColor			) {	%this.LEG_rayCastColor	 = true;	%this.LSG_rayCastColor	 =  %thisGP.rayCastColor;			%GPLerps++;	 } else %this.LEG_rayCastColor	 = false;
+
 
 	//TODO: OBJECT EXISTANCE STUFF
 	if(isObject(%thisWP) && isObject(%otherWP))
@@ -123,16 +129,13 @@ function Environment::initTransition(%this, %other)
 	%this.WaterZoneLerps = %WZLerps;
 	%this.WaterPlaneLerps = %WPLerps;
 	%this.cloudLerps = %cloudLerps;
+	%this.groundLerps = %GPLerps;
+
+	talk(%GPLerps);
 
 	%other.real_vignetteColor = (%other.var_SimpleMode ? %other.simple_VignetteColor : %other.var_VignetteColor);
 	%other.real_vignetteMultiply = (%other.var_SimpleMode ? %other.simple_VignetteMultiply : %other.var_VignetteMultiply);
 	%this.LE_Vignette = (%other.real_vignetteColor !$= %this.real_vignetteColor);
-
-	%this.LSG_opacity = getWord(%thisGP.color, 3);
-	%thisGP.blend = true;
-	
-	%otherGP.scopeToClient(%this.client);
-	%this.transitionGroundPlane = %otherGP;
 }
 
 function Environment::cancelTransition(%this, %other)
@@ -141,15 +144,6 @@ function Environment::cancelTransition(%this, %other)
 		return;
 
 	%lastLerp = %this.lastTransitionValue;
-
-	if(isObject(%this.transitionGroundPlane))
-	{
-		%this.transitionGroundPlane.clearScopeToClient(%this.client);
-
-		%this.groundPlane.color = EZ_Lerp4f(%this.color, %other.color, %lastLerp);
-	}
-
-	%this.transitionGroundPlane = -1;
 }
 
 function Environment::TimeTransition(%this, %other, %time, %start)
@@ -207,6 +201,8 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	%otherWP = %other.waterPlane;
 	%thisWZ = %this.waterZone;
 	%otherWZ = %other.waterZone;
+	%thisGP = %this.groundPlane;
+	%otherGP = %other.groundPlane;
 
 	//vignette
 	if(%this.LE_Vignette)
@@ -256,13 +252,28 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 		%this.sunlight.sendUpdate();
 	}
 
+	//groundplane
+	if(%this.groundLerps > 0)
+	{
+		if(%this.LEG_color			) { %f = %thisGP.color 		 = EZ_Lerp4i(%this.LSG_color		, %otherGP.color		 , %lerp ); }
+		if(%this.LEG_scrollSpeed	) { %thisGP.scrollSpeed  = EZ_Lerp1f(%this.LSG_scrollSpeed	, %otherGP.scrollSpeed	 , %lerp ); }
+		if(%this.LEG_loopsPerUnit	) { %thisGP.loopsPerUnit = EZ_Lerp2f(%this.LSG_loopsPerUnit	, %otherGP.loopsPerUnit	 , %lerp ); }
+		if(%this.LEG_rayCastColor	) { %thisGP.rayCastColor = EZ_Lerp1f(%this.LSG_rayCastColor	, %otherGP.rayCastColor	 , %lerp ); }
+
+		centerprintall(%f NL %thisGP.color NL %this.LSG_color NL %otherGP.color, 3);
+
+		%thisGP.blend = getWord (%thisGP.color, 3) < 255;
+
+		%thisGP.sendUpdate();
+	}
+
 	
 
 	//waterplane
 	if(%this.WaterPlaneLerps > 0)
 	{
 		if(%this.LEW_transform		) { %thisWP.setTransform  (EZ_Lerp3f(%this.LSW_transform	, %otherWP.getTransform(), %lerp)); }
-		if(%this.LEW_color			) { %thisWP.color 		 = EZ_Lerp4f(%this.LSW_color		, %otherWP.color		 , %lerp ); }
+		if(%this.LEW_color			) { %thisWP.color 		 = EZ_Lerp4i(%this.LSW_color		, %otherWP.color		 , %lerp ); }
 		if(%this.LEW_scrollSpeed	) { %thisWP.scrollSpeed  = EZ_Lerp1f(%this.LSW_scrollSpeed	, %otherWP.scrollSpeed	 , %lerp ); }
 		if(%this.LEW_loopsPerUnit	) { %thisWP.loopsPerUnit = EZ_Lerp2f(%this.LSW_loopsPerUnit	, %otherWP.loopsPerUnit	 , %lerp ); }
 		if(%this.LEW_rayCastColor	) { %thisWP.rayCastColor = EZ_Lerp1f(%this.LSW_rayCastColor	, %otherWP.rayCastColor	 , %lerp ); }
@@ -293,15 +304,7 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 
 	if(%sendSkyUpdate)
 		%thisSky.sendUpdate();
-	
-	%thisGP = %this.groundPlane;
-	%otherGP = %other.groundPlane;
 
-	//TODO: dont really like this method
-	//assuming .blend is already set
-	%thisGP.color = setWord(%thisGP.color, 3, EZ_Lerp1f(%this.LSG_opacity, 0, %lerp));
-
-	%thisGP.sendUpdate();
 	%this.lastTransitionValue = %lerp;
 }
 
@@ -310,14 +313,11 @@ function Environment::lerpPassedMidpoint(%this, %other, %lerp)
 {
 	//do texture stuff & non-lerpable
 	%this.waterPlane.colorMultiply = %other.waterPlane.colorMultiply;
+	%this.groundPlane.colorMultiply = %other.groundPlane.colorMultiply;
 }
 
 function Environment::transitionEnvironmentFinal(%this, %other)
 {
-	if(isObject(%this.transitionGroundPlane))
-		%this.transitionGroundPlane.clearScopeToClient(%this.client);
-
-	%this.transitionGroundPlane = -1;
 }
 
 //lerping angles
@@ -341,6 +341,15 @@ function EZ_LerpAf(%init, %end, %t)
 	} else {
 		return %init + (%end - %init) * %t;
 	}
+}
+
+//groundplane & waterplane .color dont work with floats at all for some reason
+function EZ_Lerp4i(%init, %end, %t)
+{
+	//init4
+	%i = getWord(%init, 3);
+	%v = vectorAdd(%init, vectorScale(vectorSub(%end, %init), %t));
+	return (getWord(%v, 0) | 0) SPC (getWord(%v, 1) | 0) SPC (getWord(%v, 2) | 0) SPC ((%i + (getWord(%end, 3) - %i) * %t) | 0);
 }
 
 function EZ_Lerp4f(%init, %end, %t)

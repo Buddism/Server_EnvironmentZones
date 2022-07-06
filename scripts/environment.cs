@@ -542,8 +542,6 @@ function Environment::postEditCheck(%this, %varType, %value)
 	%this.setupNetFlags();
 	%this.startEdit();
 
-	talk(%this);
-
 	// If new objects were added we have to ghost them to clients currently using this environment
 	for(%i = 0; %i < ClientGroup.getCount(); %i++)
 	{
