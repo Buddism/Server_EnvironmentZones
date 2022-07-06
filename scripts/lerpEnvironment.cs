@@ -172,6 +172,10 @@ function Environment::TimeTransition(%this, %other, %time, %start)
 	}
 
 	%lerp = (getSimTime() - %start) / %time;
+	//cos lerp
+	if(%lerp < 1)
+		%lerp = (1 - mCos(%lerp * $PI)) / 2;
+
 	%this.transitionEnvironment(%other, %lerp);
 
 	%this.client.bottomPrint(%lerp NL %this.sun.color, 1, 1);
@@ -233,7 +237,7 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	//sun
 	if(%this.sunLerps > 0)
 	{
-		if(%this.LES_azimuth	) { %thisSun.azimuth	 = EZ_Lerp1f(%this.LSS_azimuth	   , %otherSun.azimuth	   , %lerp); }
+		if(%this.LES_azimuth	) { %thisSun.azimuth	 = EZ_LerpAf(%this.LSS_azimuth	   , %otherSun.azimuth	   , %lerp); }
 		if(%this.LES_elevation	) { %thisSun.elevation	 = EZ_Lerp1f(%this.LSS_elevation   , %otherSun.elevation   , %lerp); }
 		if(%this.LES_color		) { %thisSun.color		 = EZ_Lerp4f(%this.LSS_color	   , %otherSun.color	   , %lerp); }
 		if(%this.LES_ambient	) { %thisSun.ambient	 = EZ_Lerp4f(%this.LSS_ambient	   , %otherSun.ambient	   , %lerp); }
@@ -314,6 +318,29 @@ function Environment::transitionEnvironmentFinal(%this, %other)
 		%this.transitionGroundPlane.clearScopeToClient(%this.client);
 
 	%this.transitionGroundPlane = -1;
+}
+
+//lerping angles
+function EZ_LerpAf(%init, %end, %t)
+{
+	%dif = %init - %end;
+	if(mAbs(%dif) > 180) // the other direction is better
+	{
+		if(%end > %init)
+			%init += 360;
+		else
+			%end += 360;
+
+		%lerp = (%init + (%end - %init) * %t);
+
+		if(%lerp >= 0 && %lerp <= 360)
+			return %lerp;
+
+		//float modulo
+		return %lerp - ( (%lerp / 360) | 0) * 360;
+	} else {
+		return %init + (%end - %init) * %t;
+	}
 }
 
 function EZ_Lerp4f(%init, %end, %t)
