@@ -142,7 +142,7 @@ function Environment::setClientEnv(%this, %other)
 	%this.real_vignetteMultiply = (%other.var_SimpleMode ? %other.simple_VignetteMultiply : %other.var_VignetteMultiply);
 	
 	if(%updateSun		) %thisSun.sendUpdate();
-	if(%updateSunLight	) %thisSunLight.sendUpdate();
+	if(%updateSunLight	) %this.sunLight.sendUpdate();
 	if(%updateSky		) %thisSky.sendUpdate();
 	if(%updateGround	) %thisGP.sendUpdate();
 	if(%updateWP		) %thisWP.sendUpdate();
