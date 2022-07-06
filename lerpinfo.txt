@@ -34,23 +34,26 @@ waterZone.appliedForce
 waterZone.setWaterColor
 
 fxPlane.color
-fxPlane.blend
 fxPlane.scrollSpeed
-
 fxPlane.loopsPerUnit
-fxPlane.colorMultiply
 fxPlane.rayCastColor
 
 //> 50 % LERP VARS
 fxPlane.colorMultiply
+
 fxPlane.topTexture
 fxPlane.bottomTexture
 
 sunLight.setFlareBitmaps
 
 Sky.materialList
-sky.renderBottomTexture
+Sky.renderBottomTexture
 sky.noRenderBans
+
+var_SkyIdx
+var_WaterIdx
+var_GroundIdx
+
 
 //ignored:
 // RAIN (no sendupdate)

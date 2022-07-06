@@ -131,8 +131,6 @@ function Environment::initTransition(%this, %other)
 	%this.cloudLerps = %cloudLerps;
 	%this.groundLerps = %GPLerps;
 
-	talk(%GPLerps);
-
 	%other.real_vignetteColor = (%other.var_SimpleMode ? %other.simple_VignetteColor : %other.var_VignetteColor);
 	%other.real_vignetteMultiply = (%other.var_SimpleMode ? %other.simple_VignetteMultiply : %other.var_VignetteMultiply);
 	%this.LE_Vignette = (%other.real_vignetteColor !$= %this.real_vignetteColor);
@@ -184,8 +182,11 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 
 	%lerp = mClampF(%lerp, 0, 1);
 	if(%lerp >= 0.5 && %this.lastTransitionValue < 0.5)
+	{
 		%this.lerpPassedMidpoint(%other, %lerp);
-	else if(%lerp >= 1.0 && %this.lastTransitionValue < 1)
+		%sendSkyUpdate = true;
+
+	} else if(%lerp >= 1.0 && %this.lastTransitionValue < 1)
 	{
 		%this.transitionEnvironmentFinal(%other);
 		%this.setClientEnv(%other);
@@ -255,16 +256,14 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	//groundplane
 	if(%this.groundLerps > 0)
 	{
-		if(%this.LEG_color			) { %f = %thisGP.color 		 = EZ_Lerp4i(%this.LSG_color		, %otherGP.color		 , %lerp ); }
+		if(%this.LEG_color			) { %thisGP.color 		 = EZ_Lerp4i(%this.LSG_color		, %otherGP.color		 , %lerp ); }
 		if(%this.LEG_scrollSpeed	) { %thisGP.scrollSpeed  = EZ_Lerp1f(%this.LSG_scrollSpeed	, %otherGP.scrollSpeed	 , %lerp ); }
 		if(%this.LEG_loopsPerUnit	) { %thisGP.loopsPerUnit = EZ_Lerp2f(%this.LSG_loopsPerUnit	, %otherGP.loopsPerUnit	 , %lerp ); }
 		if(%this.LEG_rayCastColor	) { %thisGP.rayCastColor = EZ_Lerp1f(%this.LSG_rayCastColor	, %otherGP.rayCastColor	 , %lerp ); }
 
-		centerprintall(%f NL %thisGP.color NL %this.LSG_color NL %otherGP.color, 3);
-
 		%thisGP.blend = getWord (%thisGP.color, 3) < 255;
 
-		%thisGP.sendUpdate();
+		%sendGPUpdate = true;
 	}
 
 	
@@ -280,7 +279,7 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 
 		%thisWP.blend = getWord (%thisWP.color, 3) < 255;
 
-		%thisWP.sendUpdate();
+		%sendWPUpdate = true;
 	}
 
 	//waterzone
@@ -302,6 +301,12 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 		%sendSkyUpdate = true;
 	}
 
+	if(%sendGPUpdate)
+		%thisGP.sendUpdate();
+
+	if(%sendWPUpdate)
+		%thisWP.sendUpdate();
+
 	if(%sendSkyUpdate)
 		%thisSky.sendUpdate();
 
@@ -311,9 +316,36 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 
 function Environment::lerpPassedMidpoint(%this, %other, %lerp)
 {
+	if(!isObject(%other))
+		return;
+	
+	%thisSky = %this.sky;
+	%otherSky = %other.sky;
+	%thisWP = %this.waterPlane;
+	%otherWP = %other.waterPlane;
+	%thisGP = %this.groundPlane;
+	%otherGP = %other.groundPlane;
+
 	//do texture stuff & non-lerpable
-	%this.waterPlane.colorMultiply = %other.waterPlane.colorMultiply;
-	%this.groundPlane.colorMultiply = %other.groundPlane.colorMultiply;
+	%thisWP.colorMultiply 		 = %otherWP.colorMultiply;
+	%thisWP.topTexture			 = %otherWP.topTexture;
+	%thisWP.bottomTexture		 = %otherWP.bottomTexture;
+
+	%thisGP.colorMultiply 		 = %otherGP.colorMultiply;
+	%thisGP.topTexture			 = %otherGP.topTexture;
+	%thisGP.bottomTexture		 = %otherGP.bottomTexture;
+
+	%thisSky.renderBottomTexture = %others.renderBottomTexture;
+	%thisSky.noRenderBans		 = %otherSky.noRenderBan;
+	%thisSky.materialList		 = %otherSky.materialList;
+
+	%this.SunLight.setFlareBitmaps (%other.sunLight.removeFlareBitmap, %other.sunLight.localFlareBitmap);
+	
+	%this.var_SkyIdx = %other.var_SkyIdx;
+	%this.var_WaterIdx = %other.var_WaterIdx;
+	%this.var_GroundIdx = %other.var_GroundIdx;
+
+	//will sendupdate using main function
 }
 
 function Environment::transitionEnvironmentFinal(%this, %other)
