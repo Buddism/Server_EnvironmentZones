@@ -121,6 +121,12 @@ function Environment::setClientEnv(%this, %other)
 	if(!isObject(%this.dayCycle))
 		%this.copyDayCycleFrom(%other);
 
+	if(isObject (%this.Rain))
+		%this.Rain.delete ();
+		
+	if(isObject(%other.rain))
+		%this.copyRainFrom(%other);
+
 	//im just gonna ignore this (skybox handles it instead?)
 	//loadDayCycle ($EnvGuiServer::DayCycle[%other.var_DayCycleIdx]);
 
@@ -283,13 +289,6 @@ function Environment::setSkyBox (%this, %other, %noUpdate)
 	%this.SunLight.setFlareBitmaps (%other.sunLight.remoteFlareBitmap, %other.sunLight.localFlareBitmap);
 	%this.SunLight.FlareSize = %other.SunLight.FlareSize;
 	%this.SunLight.color = %other.SunLight.color;
-
-	if(isObject (%this.Rain))
-		%this.Rain.delete ();
-
-	//dont like how rain is bound to skyboxes
-	if(isObject(%other.rain))
-		%this.copyRainFrom(%other);
 
 	if(!%noUpdate)
 	{
