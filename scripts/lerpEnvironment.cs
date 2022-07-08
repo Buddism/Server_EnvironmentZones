@@ -343,7 +343,7 @@ function Environment::lerpPassedMidpoint(%this, %other, %lerp)
 	%thisSky.noRenderBans		 = %otherSky.noRenderBan;
 	%thisSky.materialList		 = %otherSky.materialList;
 
-	%this.SunLight.setFlareBitmaps (%other.sunLight.removeFlareBitmap, %other.sunLight.localFlareBitmap);
+	%this.SunLight.setFlareBitmaps (%other.sunLight.remoteFlareBitmap, %other.sunLight.localFlareBitmap);
 	
 	%this.var_SkyIdx = %other.var_SkyIdx;
 	%this.var_WaterIdx = %other.var_WaterIdx;

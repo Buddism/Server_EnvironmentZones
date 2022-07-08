@@ -34,7 +34,7 @@ function Environment::setClientEnv(%this, %other)
 	{
 		%this.sunLight.FlareSize = %other.sunLight.FlareSize;
 		%this.sunLight.color 	 = %other.sunLight.color;
-		%this.SunLight.setFlareBitmaps (%other.sunLight.removeFlareBitmap, %other.sunLight.localFlareBitmap);
+		%this.SunLight.setFlareBitmaps (%other.sunLight.remoteFlareBitmap, %other.sunLight.localFlareBitmap);
 
 		%updateSunLight = true;
 	} else {
@@ -280,7 +280,7 @@ function Environment::setSkyBox (%this, %other, %noUpdate)
 	%thisSun.ambient = %otherSun.ambient;
 	%thisSun.shadowColor = %otherSun.shadowColor;
 
-	%this.SunLight.setFlareBitmaps (%other.sunLight.removeFlareBitmap, %other.sunLight.localFlareBitmap);
+	%this.SunLight.setFlareBitmaps (%other.sunLight.remoteFlareBitmap, %other.sunLight.localFlareBitmap);
 	%this.SunLight.FlareSize = %other.SunLight.FlareSize;
 	%this.SunLight.color = %other.SunLight.color;
 
