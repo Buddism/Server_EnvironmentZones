@@ -1,5 +1,8 @@
 function Environment::initTransition(%this, %other)
 {
+	if(!isObject(%other))
+		return false;
+
 	//short vars:
 	// LE - LERP_ENABLED
 	// LS - LERP_START
@@ -123,9 +126,15 @@ function Environment::initTransition(%this, %other)
 	%this.cloudLerps = %cloudLerps;
 	%this.groundLerps = %GPLerps;
 
+	%totalLerps = %skyLerps + %sunLerps + %sunLight + %WZLerps + %WPLerps + %cloudLerps + %GPLerps;
+	if(%totalLerps == 0)
+		return false;
+
 	%other.real_vignetteColor = (%other.var_SimpleMode ? %other.simple_VignetteColor : %other.var_VignetteColor);
 	%other.real_vignetteMultiply = (%other.var_SimpleMode ? %other.simple_VignetteMultiply : %other.var_VignetteMultiply);
 	%this.LE_Vignette = (%other.real_vignetteColor !$= %this.real_vignetteColor);
+
+	return true;
 }
 
 function Environment::cancelTransition(%this, %other)
@@ -150,7 +159,7 @@ function Environment::TimeTransition(%this, %other, %time, %start)
 			return %this.setClientEnv(%other);
 
 		%start = getSimTime();
-		%this.initTransition(%other);
+		%hasLerps = %this.initTransition(%other);
 
 		cancel(%this.transitionSchedule);
 	}
@@ -249,8 +258,8 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	if(%this.groundLerps > 0)
 	{
 		if(%this.LEG_color			) { %thisGP.color 		 = EZ_Lerp4i(%this.LSG_color		, %otherGP.color		 , %lerp ); }
-		if(%this.LEG_scrollSpeed	) { %thisGP.scrollSpeed  = EZ_Lerp1f(%this.LSG_scrollSpeed	, %otherGP.scrollSpeed	 , %lerp ); }
-		if(%this.LEG_loopsPerUnit	) { %thisGP.loopsPerUnit = EZ_Lerp2f(%this.LSG_loopsPerUnit	, %otherGP.loopsPerUnit	 , %lerp ); }
+		if(%this.LEG_scrollSpeed	) { %thisGP.scrollSpeed  = EZ_Lerp2f(%this.LSG_scrollSpeed	, %otherGP.scrollSpeed	 , %lerp ); }
+		if(%this.LEG_loopsPerUnit	) { %thisGP.loopsPerUnit = EZ_Lerp1f(%this.LSG_loopsPerUnit	, %otherGP.loopsPerUnit	 , %lerp ); }
 		if(%this.LEG_rayCastColor	) { %thisGP.rayCastColor = EZ_Lerp1f(%this.LSG_rayCastColor	, %otherGP.rayCastColor	 , %lerp ); }
 
 		%thisGP.blend = getWord (%thisGP.color, 3) < 255;
@@ -265,8 +274,8 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	{
 		if(%this.LEW_position		) { %thisWP.setTransform  (EZ_Lerp3f(%this.LSW_position		, %this.LFW_position	 , %lerp ) SPC getWords(%this.LSW_position, 3, 6));	}
 		if(%this.LEW_color			) { %thisWP.color 		 = EZ_Lerp4i(%this.LSW_color		, %otherWP.color		 , %lerp ); 										}
-		if(%this.LEW_scrollSpeed	) { %thisWP.scrollSpeed  = EZ_Lerp1f(%this.LSW_scrollSpeed	, %otherWP.scrollSpeed	 , %lerp ); 										}
-		if(%this.LEW_loopsPerUnit	) { %thisWP.loopsPerUnit = EZ_Lerp2f(%this.LSW_loopsPerUnit	, %otherWP.loopsPerUnit	 , %lerp ); 										}
+		if(%this.LEW_scrollSpeed	) { %thisWP.scrollSpeed  = EZ_Lerp2f(%this.LSW_scrollSpeed	, %otherWP.scrollSpeed	 , %lerp ); 										}
+		if(%this.LEW_loopsPerUnit	) { %thisWP.loopsPerUnit = EZ_Lerp1f(%this.LSW_loopsPerUnit	, %otherWP.loopsPerUnit	 , %lerp ); 										}
 		if(%this.LEW_rayCastColor	) { %thisWP.rayCastColor = EZ_Lerp1f(%this.LSW_rayCastColor	, %otherWP.rayCastColor	 , %lerp ); 										}
 
 		%thisWP.blend = getWord (%thisWP.color, 3) < 255;
