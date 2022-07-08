@@ -744,6 +744,7 @@ function Environment::SetVar(%this, %varName, %value, %other)
 				EnvGuiServer::SendVignetteAll ();
 			}
 	}
+	
 	return "";
 }
 

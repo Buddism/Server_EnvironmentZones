@@ -3,6 +3,7 @@ function Environment::initTransition(%this, %other)
 	//short vars:
 	// LE - LERP_ENABLED
 	// LS - LERP_START
+	// LF - LERP_FINAL
 	//overlapping var names will be differentiatied by short name of the object
 	%this.lastTransitionValue = 0;
 
@@ -49,16 +50,15 @@ function Environment::initTransition(%this, %other)
 	if(%thisGP.rayCastColor 			!$= %otherGP.rayCastColor			) {	%this.LEG_rayCastColor	 = true;	%this.LSG_rayCastColor	 =  %thisGP.rayCastColor;			%GPLerps++;	 } else %this.LEG_rayCastColor	 = false;
 
 
-	//TODO: OBJECT EXISTANCE STUFF
 	if(isObject(%thisWP) && isObject(%otherWP))
 	{
-		if(%thisWP.getTransform() 		!$= %otherWP.getTransform()			) { %this.LEW_transform		 = true;	%this.LSW_transform		 = %thisWP.getTransform();			%WPLerps++;	 } else %this.LEW_transform		 = false;
-		if(%thisWP.color 				!$= %otherWP.color					) { %this.LEW_color			 = true;	%this.LSW_color			 = %thisWP.color;					%WPLerps++;	 } else %this.LEW_color			 = false;
-		if(%thisWP.scrollSpeed 			!$= %otherWP.scrollSpeed			) { %this.LEW_scrollSpeed	 = true;	%this.LSW_scrollSpeed	 = %thisWP.scrollSpeed;				%WPLerps++;	 } else %this.LEW_scrollSpeed	 = false;
-		if(%thisWP.loopsPerUnit 		!$= %otherWP.loopsPerUnit			) { %this.LEW_loopsPerUnit	 = true;	%this.LSW_loopsPerUnit	 = %thisWP.loopsPerUnit;			%WPLerps++;	 } else %this.LEW_loopsPerUnit	 = false;
-		if(%thisWP.rayCastColor 		!$= %otherWP.rayCastColor			) { %this.LEW_rayCastColor	 = true;	%this.LSW_rayCastColor	 = %thisWP.rayCastColor;			%WPLerps++;	 } else %this.LEW_rayCastColor	 = false;
+		if(%thisWP.getPosition() 		!$= %otherWP.getPosition()			) { %this.LEW_position		 = true;	%this.LSW_position		 = %thisWP.getTransform(); %this.LFW_position = %otherWP.getPosition(); %WPLerps++;	 } else %this.LEW_position		 = false;
+		if(%thisWP.color 				!$= %otherWP.color					) { %this.LEW_color			 = true;	%this.LSW_color			 = %thisWP.color;														%WPLerps++;	 } else %this.LEW_color			 = false;
+		if(%thisWP.scrollSpeed 			!$= %otherWP.scrollSpeed			) { %this.LEW_scrollSpeed	 = true;	%this.LSW_scrollSpeed	 = %thisWP.scrollSpeed;													%WPLerps++;	 } else %this.LEW_scrollSpeed	 = false;
+		if(%thisWP.loopsPerUnit 		!$= %otherWP.loopsPerUnit			) { %this.LEW_loopsPerUnit	 = true;	%this.LSW_loopsPerUnit	 = %thisWP.loopsPerUnit;												%WPLerps++;	 } else %this.LEW_loopsPerUnit	 = false;
+		if(%thisWP.rayCastColor 		!$= %otherWP.rayCastColor			) { %this.LEW_rayCastColor	 = true;	%this.LSW_rayCastColor	 = %thisWP.rayCastColor;												%WPLerps++;	 } else %this.LEW_rayCastColor	 = false;
 	} else {
-		%this.LEW_transform		 = false;
+		%this.LEW_position		 = false;
 		%this.LEW_color			 = false;
 		%this.LEW_scrollSpeed	 = false;
 		%this.LEW_loopsPerUnit	 = false;
@@ -67,34 +67,26 @@ function Environment::initTransition(%this, %other)
 		if(isObject(%thisWP) && !isObject(%otherWP))
 		{
 			//need to shrink thisWP to nothing
-			%this.LEW_transform		 = true;
-			%this.LSW_transform		 = %otherWP.getPosition();
+			%this.LEW_position		 = true;
+			%this.LSW_position		 = %thisWP.getTransform();
+			%this.LFW_position 		 = setWord(%this.LSW_position, 2, -0.5);
+
 			%WPLerps = 1;
 		} else if(isObject(%otherWP)) {
 			//need to grow thisWP (which doesnt exist yet) to otherWP
-			%this.LEW_transform		 = true;
-			%WPLerps = 1;
-
 			//create our water plane
-			%this.copyWaterPlaneFrom(%otherWP);
+			%this.copyWaterPlaneFrom(%other);
 			%thisWP = %this.waterPlane;
 
-			%startOfTransition = "0 0 0";
-			if(isObject(%other.zone))
-			{
-				//height of the other WaterPlane
-				%height = getWord(%otherWP.getTransform(), 2) - 0.05;
-				%zoneZ1 = getWord(%other.zone.point1, 2); //the lowest corner
+			%startOfTransition = "0 0 -0.5";
+			
+			%transformRot = getWords(%otherWP.getTransform(), 3, 6);
+			%thisWP.setTransform(%startOfTransition SPC %transformRot);
 
-				//if the height is inside the zone
-				if(%height > %zoneZ1)
-					%startOfTransition = %zoneZ1;
-			}
-			//%bottomOfEnvZone
-
-			//might be a bad idea to do it from the bottom of the env zone
-			%thisWP.setTransform(%startOfTransition);
-			%thisWP.LSW_transform = %startOfTransition;
+			%this.LSW_position = %startOfTransition SPC %transformRot;
+			%this.LFW_position = %otherWP.getTransform();
+			%this.LEW_position = true;
+			%WPLerps = 1;
 		}
 	}
 
@@ -271,11 +263,11 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	//waterplane
 	if(%this.WaterPlaneLerps > 0)
 	{
-		if(%this.LEW_transform		) { %thisWP.setTransform  (EZ_Lerp3f(%this.LSW_transform	, %otherWP.getTransform(), %lerp)); }
-		if(%this.LEW_color			) { %thisWP.color 		 = EZ_Lerp4i(%this.LSW_color		, %otherWP.color		 , %lerp ); }
-		if(%this.LEW_scrollSpeed	) { %thisWP.scrollSpeed  = EZ_Lerp1f(%this.LSW_scrollSpeed	, %otherWP.scrollSpeed	 , %lerp ); }
-		if(%this.LEW_loopsPerUnit	) { %thisWP.loopsPerUnit = EZ_Lerp2f(%this.LSW_loopsPerUnit	, %otherWP.loopsPerUnit	 , %lerp ); }
-		if(%this.LEW_rayCastColor	) { %thisWP.rayCastColor = EZ_Lerp1f(%this.LSW_rayCastColor	, %otherWP.rayCastColor	 , %lerp ); }
+		if(%this.LEW_position		) { %thisWP.setTransform  (EZ_Lerp3f(%this.LSW_position		, %this.LFW_position	 , %lerp ) SPC getWords(%this.LSW_position, 3, 6));	}
+		if(%this.LEW_color			) { %thisWP.color 		 = EZ_Lerp4i(%this.LSW_color		, %otherWP.color		 , %lerp ); 										}
+		if(%this.LEW_scrollSpeed	) { %thisWP.scrollSpeed  = EZ_Lerp1f(%this.LSW_scrollSpeed	, %otherWP.scrollSpeed	 , %lerp ); 										}
+		if(%this.LEW_loopsPerUnit	) { %thisWP.loopsPerUnit = EZ_Lerp2f(%this.LSW_loopsPerUnit	, %otherWP.loopsPerUnit	 , %lerp ); 										}
+		if(%this.LEW_rayCastColor	) { %thisWP.rayCastColor = EZ_Lerp1f(%this.LSW_rayCastColor	, %otherWP.rayCastColor	 , %lerp ); 										}
 
 		%thisWP.blend = getWord (%thisWP.color, 3) < 255;
 
@@ -327,9 +319,12 @@ function Environment::lerpPassedMidpoint(%this, %other, %lerp)
 	%otherGP = %other.groundPlane;
 
 	//do texture stuff & non-lerpable
-	%thisWP.colorMultiply 		 = %otherWP.colorMultiply;
-	%thisWP.topTexture			 = %otherWP.topTexture;
-	%thisWP.bottomTexture		 = %otherWP.bottomTexture;
+	if(isObject(%otherWP))
+	{
+		%thisWP.colorMultiply 		 = %otherWP.colorMultiply;
+		%thisWP.topTexture			 = %otherWP.topTexture;
+		%thisWP.bottomTexture		 = %otherWP.bottomTexture;
+	}
 
 	%thisGP.colorMultiply 		 = %otherGP.colorMultiply;
 	%thisGP.topTexture			 = %otherGP.topTexture;
