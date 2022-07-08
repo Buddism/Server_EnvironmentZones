@@ -145,37 +145,6 @@ function Environment::cancelTransition(%this, %other)
 	%lastLerp = %this.lastTransitionValue;
 }
 
-function Environment::TimeTransition(%this, %other, %time, %start)
-{
-	if(!isObject(%other))
-		return;
-
-	if(%start == 0)
-	{
-		if(isEventPending(%this.transitionSchedule))
-			%this.cancelTransition(%other);
-
-		if(%time == 0 || !%this.hasCreatedEnvironment)
-			return %this.setClientEnv(%other);
-
-		%start = getSimTime();
-		%hasLerps = %this.initTransition(%other);
-
-		cancel(%this.transitionSchedule);
-	}
-
-	%lerp = (getSimTime() - %start) / %time;
-	//cos lerp
-	if(%lerp < 1)
-		%lerp = (1 - mCos(%lerp * $PI)) / 2;
-
-	%this.transitionEnvironment(%other, %lerp);
-
-	%this.client.bottomPrint(%lerp NL %this.sun.color, 1, 1);
-	if(%lerp < 1)
-		%this.transitionSchedule = %this.schedule(31, TimeTransition, %other, %time, %start);
-}
-
 function Environment::transitionEnvironment(%this, %other, %lerp)
 {
 	if(!isObject(%other))
