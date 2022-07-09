@@ -126,13 +126,13 @@ function Environment::initTransition(%this, %other)
 
 			//set num drops = %rain.setPercentange( numDrops / %rain.numDrops )
 			%this.LER_Percentage = 2; //enabled type 2
-			%this.LSR_Percentage = 1;
+			%this.LSR_Percentage = %this.rain.getPercentage();
 			//need to update this at 50%
 			%this.LFR_Percentage = %otherNumDrops / %thisNumDrops;
 		} else {
 			//dimish to 0 percentage
 			%this.LER_Percentage = 1; //enabled type 1
-			%this.LSR_Percentage = 1;
+			%this.LSR_Percentage = %this.rain.getPercentage();
 			%this.LFR_Percentage = 0;
 		}
 	} else {
@@ -142,7 +142,7 @@ function Environment::initTransition(%this, %other)
 			%this.copyRainFrom(%other);
 			%this.LER_Percentage = 1;
 			%this.LSR_Percentage = 0;
-			%this.LFR_Percentage = 1;
+			%this.LFR_Percentage = %other.rain.getPercentage();
 			%this.rain.setPercentange(0);
 		} else {
 			//neither objects exist
@@ -304,7 +304,7 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 		%sendSkyUpdate = true;
 	}
 
-	if(%this.LER_Percentage		  ) { %this.rain.setPercentange(EZ_Lerp1f(%this.LSR_Percentage	 , %this.LFR_Percentage	   , %lerp));}
+	if(%this.LER_Percentage		  ) { %this.rain.setPercentange(EZ_Lerp1f(%this.LSR_Percentage	 , %this.LFR_Percentage	   , %lerp)); }
 
 	if(%sendGPUpdate)
 		%thisGP.sendUpdate();
@@ -367,7 +367,7 @@ function Environment::transitionPassedMidpoint(%this, %other, %lerp)
 
 	if(%this.LER_Percentage == 2) //type 2 is update at midpoint
 	{
-		%curNumDrops = %this.rain.numDrops * EZ_Lerp1f(%this.LSR_Percentage, %this.LFR_Percentage, %this.lastTransitionValue);
+		%curNumDrops = %this.rain.numDrops * %this.rain.getPercentage();
 		%this.rain.delete();
 		%this.copyRainFrom(%other);
 
@@ -442,3 +442,19 @@ function EZ_Lerp1f(%init, %end, %t)
 {
 	return %init + (%end - %init) * %t;
 }
+
+function Precipitation::getPercentage(%this)
+{
+	if(%this.percentage $= "")
+		return 1;
+
+	return %this.percentage;
+}
+package TransitionalEnvironments
+{
+	function Precipitation::setPercentange(%this, %percent)
+	{
+		%this.percentage = %percent;
+		parent::setPercentange(%this, %percent);
+	}
+};

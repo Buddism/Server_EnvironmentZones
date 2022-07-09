@@ -38,5 +38,7 @@ exec("./scripts/lerpEnvironment.cs");
 exec("./scripts/lerpTypes.cs");
 
 activatePackage(EnvironmentZones);
+activatePackage(TransitionalEnvironments);
+
 if(!isObject(EnvironmentZoneGroup))
 	new ScriptGroup(EnvironmentZoneGroup);
