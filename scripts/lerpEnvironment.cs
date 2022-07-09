@@ -26,40 +26,47 @@ function Environment::initTransition(%this, %other)
 	%otherGP = %other.groundPlane;
 
 	//sun
-	if(%thisSun.azimuth					!$=	%otherSun.azimuth				) {	%this.LES_azimuth	 	 = true;	%this.LSS_azimuth	 	 =	%thisSun.azimuth;				%sunLerps++; } else %this.LES_azimuth	 	 = false;
-	if(%thisSun.elevation				!$=	%otherSun.elevation				) {	%this.LES_elevation	 	 = true;	%this.LSS_elevation	 	 =	%thisSun.elevation;				%sunLerps++; } else %this.LES_elevation	 	 = false;
-	if(%thisSun.color					!$=	%otherSun.color					) {	%this.LES_color		 	 = true;	%this.LSS_color		 	 =	%thisSun.color;					%sunLerps++; } else %this.LES_color		 	 = false;
-	if(%thisSun.ambient					!$=	%otherSun.ambient				) {	%this.LES_ambient	 	 = true;	%this.LSS_ambient	 	 =	%thisSun.ambient;				%sunLerps++; } else %this.LES_ambient	 	 = false;
-	if(%thisSun.shadowColor				!$=	%otherSun.shadowColor			) {	%this.LES_shadowColor 	 = true;	%this.LSS_shadowColor 	 =	%thisSun.shadowColor;			%sunLerps++; } else %this.LES_shadowColor 	 = false;
+	if(%thisSun.azimuth			 !$= %otherSun.azimuth		  ) { %this.LES_azimuth			= true;	%this.LSS_azimuth	 	 =	%thisSun.azimuth;				%sunLerps++; } else %this.LES_azimuth	 	 = false;
+	if(%thisSun.elevation		 !$= %otherSun.elevation	  ) { %this.LES_elevation		= true;	%this.LSS_elevation	 	 =	%thisSun.elevation;				%sunLerps++; } else %this.LES_elevation	 	 = false;
+	if(%thisSun.color			 !$= %otherSun.color		  ) { %this.LES_color			= true;	%this.LSS_color		 	 =	%thisSun.color;					%sunLerps++; } else %this.LES_color		 	 = false;
+	if(%thisSun.ambient			 !$= %otherSun.ambient		  ) { %this.LES_ambient			= true;	%this.LSS_ambient	 	 =	%thisSun.ambient;				%sunLerps++; } else %this.LES_ambient	 	 = false;
+	if(%thisSun.shadowColor		 !$= %otherSun.shadowColor	  ) { %this.LES_shadowColor		= true;	%this.LSS_shadowColor 	 =	%thisSun.shadowColor;			%sunLerps++; } else %this.LES_shadowColor 	 = false;
 
 	//sunlight
-	if(%this.sunLight.FlareSize			!$= %other.sunLight.FlareSize		) { %this.LESL_FlareSize	 = true;	%this.LSSL_FlareSize	 =	%this.sunLight.FlareSize;		%sunLight++; } else %this.LESL_FlareSize	 = false;
-	if(%this.sunLight.color				!$= %other.sunLight.color			) { %this.LESL_color	 	 = true;	%this.LSSL_color	 	 =	%this.sunLight.color; 			%sunLight++; } else %this.LESL_color	 	 = false;
+	if(%this.sunLight.FlareSize	 !$= %other.sunLight.FlareSize) { %this.LESL_FlareSize		= true;	%this.LSSL_FlareSize	 =	%this.sunLight.FlareSize;		%sunLight++; } else %this.LESL_FlareSize	 = false;
+	if(%this.sunLight.color		 !$= %other.sunLight.color	  ) { %this.LESL_color	 		= true;	%this.LSSL_color	 	 =	%this.sunLight.color; 			%sunLight++; } else %this.LESL_color	 	 = false;
 
 	//sky
-	if(%thisSky.visibleDistance			!$=	%otherSky.visibleDistance		) {	%this.LES_visibleDistance = true;	%this.LSS_visibleDistance=	%thisSky.visibleDistance;		%skyLerps++; } else %this.LES_visibleDistance= false;
-	if(%thisSky.fogDistance				!$=	%otherSky.fogDistance			) {	%this.LES_fogDistance	 = true;	%this.LSS_fogDistance	 =	%thisSky.fogDistance;			%skyLerps++; } else %this.LES_fogDistance	 = false;
-	if(%thisSky.fogColor				!$=	%otherSky.fogColor				) {	%this.LES_fogColor		 = true;	%this.LSS_fogColor		 =	%thisSky.fogColor;				%skyLerps++; } else %this.LES_fogColor		 = false;
-	if(%thisSky.skyColor				!$=	%otherSky.skyColor				) {	%this.LES_skyColor		 = true;	%this.LSS_skyColor		 =	%thisSky.skyColor;				%skyLerps++; } else %this.LES_skyColor		 = false;
-	if(%thisSky.fogVolume1				!$=	%otherSky.fogVolume1			) {	%this.LES_fogVolume1	 = true;	%this.LSS_fogVolume1	 =	%thisSky.fogVolume1;			%skyLerps++; } else %this.LES_fogVolume1	 = false;
-	if(%thisSky.windVelocity 			!$= %otherSky.windVelocity			) {	%this.LES_windVelocity	 = true;	%this.LSS_windVelocity	 =	%thisSky.windVelocity;			%skyLerps++; } else %this.LES_windVelocity	 = false;
+	if(%thisSky.visibleDistance	 !$= %otherSky.visibleDistance) { %this.LES_visibleDistance	= true;	%this.LSS_visibleDistance=	%thisSky.visibleDistance;		%skyLerps++; } else %this.LES_visibleDistance= false;
+	if(%thisSky.fogDistance		 !$= %otherSky.fogDistance	  ) { %this.LES_fogDistance	 	= true;	%this.LSS_fogDistance	 =	%thisSky.fogDistance;			%skyLerps++; } else %this.LES_fogDistance	 = false;
+	if(%thisSky.fogColor		 !$= %otherSky.fogColor		  ) { %this.LES_fogColor		= true;	%this.LSS_fogColor		 =	%thisSky.fogColor;				%skyLerps++; } else %this.LES_fogColor		 = false;
+	if(%thisSky.skyColor		 !$= %otherSky.skyColor		  ) { %this.LES_skyColor		= true;	%this.LSS_skyColor		 =	%thisSky.skyColor;				%skyLerps++; } else %this.LES_skyColor		 = false;
+	if(%thisSky.fogVolume1		 !$= %otherSky.fogVolume1	  ) { %this.LES_fogVolume1	 	= true;	%this.LSS_fogVolume1	 =	%thisSky.fogVolume1;			%skyLerps++; } else %this.LES_fogVolume1	 = false;
+	if(%thisSky.windVelocity 	 !$= %otherSky.windVelocity	  ) { %this.LES_windVelocity	= true;	%this.LSS_windVelocity	 =	%thisSky.windVelocity;			%skyLerps++; } else %this.LES_windVelocity	 = false;
 
 	if( (%thisSky.windEffectPrecipitation || %otherSky.windEffectPrecipitation) )
 		%thisSky.windEffectPrecipitation = true;
 
-	if(%thisGP.color 					!$= %otherGP.color					) {	%this.LEG_color			 = true;	%this.LSG_color			 =  %thisGP.color;					%GPLerps++;	 } else %this.LEG_color			 = false;
-	if(%thisGP.scrollSpeed 				!$= %otherGP.scrollSpeed			) {	%this.LEG_scrollSpeed	 = true;	%this.LSG_scrollSpeed	 =  %thisGP.scrollSpeed;			%GPLerps++;	 } else %this.LEG_scrollSpeed	 = false;
-	if(%thisGP.loopsPerUnit 			!$= %otherGP.loopsPerUnit			) {	%this.LEG_loopsPerUnit	 = true;	%this.LSG_loopsPerUnit	 =  %thisGP.loopsPerUnit;			%GPLerps++;	 } else %this.LEG_loopsPerUnit	 = false;
-	if(%thisGP.rayCastColor 			!$= %otherGP.rayCastColor			) {	%this.LEG_rayCastColor	 = true;	%this.LSG_rayCastColor	 =  %thisGP.rayCastColor;			%GPLerps++;	 } else %this.LEG_rayCastColor	 = false;
+	if(%thisGP.color 			 !$= %otherGP.color			  ) { %this.LEG_color			= true;	%this.LSG_color			 =  %thisGP.color;					%GPLerps++;	 } else %this.LEG_color			 = false;
+	if(%thisGP.scrollSpeed 		 !$= %otherGP.scrollSpeed	  ) { %this.LEG_scrollSpeed	  	= true;	%this.LSG_scrollSpeed	 =  %thisGP.scrollSpeed;			%GPLerps++;	 } else %this.LEG_scrollSpeed	 = false;
+	if(%thisGP.loopsPerUnit 	 !$= %otherGP.loopsPerUnit	  ) { %this.LEG_loopsPerUnit	= true;	%this.LSG_loopsPerUnit	 =  %thisGP.loopsPerUnit;			%GPLerps++;	 } else %this.LEG_loopsPerUnit	 = false;
+	if(%thisGP.rayCastColor 	 !$= %otherGP.rayCastColor	  ) { %this.LEG_rayCastColor	= true;	%this.LSG_rayCastColor	 =  %thisGP.rayCastColor;			%GPLerps++;	 } else %this.LEG_rayCastColor	 = false;
 
+	//not sure if cloudHeight is used but im adding
+	if(%thisSky.cloudHeight[0]	 !$= %otherSky.cloudHeight[0] ) { %this.LE_cloudHeight[0]	= true;	%this.LS_cloudHeight[0]	 = %thisSky.cloudHeight[0];		  %cloudLerps++; } else %this.LE_cloudHeight[0]	 = false;
+	if(%thisSky.cloudHeight[1]	 !$= %otherSky.cloudHeight[1] ) { %this.LE_cloudHeight[1]	= true;	%this.LS_cloudHeight[1]	 = %thisSky.cloudHeight[1];		  %cloudLerps++; } else %this.LE_cloudHeight[1]	 = false;
+	if(%thisSky.cloudHeight[2]	 !$= %otherSky.cloudHeight[2] ) { %this.LE_cloudHeight[2]	= true;	%this.LS_cloudHeight[2]	 = %thisSky.cloudHeight[2];		  %cloudLerps++; } else %this.LE_cloudHeight[2]	 = false;
+	if(%thisSky.cloudSpeed[0]	 !$= %otherSky.cloudSpeed[0]  ) { %this.LE_cloudSpeed[0]	= true;	%this.LS_cloudSpeed[0]	 = %thisSky.cloudSpeed[0];		  %cloudLerps++; } else %this.LE_cloudSpeed[0]	 = false;
+	if(%thisSky.cloudSpeed[1]	 !$= %otherSky.cloudSpeed[1]  ) { %this.LE_cloudSpeed[1]	= true;	%this.LS_cloudSpeed[1]	 = %thisSky.cloudSpeed[1];		  %cloudLerps++; } else %this.LE_cloudSpeed[1]	 = false;
+	if(%thisSky.cloudSpeed[2]	 !$= %otherSky.cloudSpeed[2]  ) { %this.LE_cloudSpeed[2]	= true;	%this.LS_cloudSpeed[2]	 = %thisSky.cloudSpeed[2];		  %cloudLerps++; } else %this.LE_cloudSpeed[2]	 = false;
 
 	if(isObject(%thisWP) && isObject(%otherWP))
 	{
-		if(%thisWP.getPosition() 		!$= %otherWP.getPosition()			) { %this.LEW_position		 = true;	%this.LSW_position		 = %thisWP.getTransform(); %this.LFW_position = %otherWP.getPosition(); %WPLerps++;	 } else %this.LEW_position		 = false;
-		if(%thisWP.color 				!$= %otherWP.color					) { %this.LEW_color			 = true;	%this.LSW_color			 = %thisWP.color;														%WPLerps++;	 } else %this.LEW_color			 = false;
-		if(%thisWP.scrollSpeed 			!$= %otherWP.scrollSpeed			) { %this.LEW_scrollSpeed	 = true;	%this.LSW_scrollSpeed	 = %thisWP.scrollSpeed;													%WPLerps++;	 } else %this.LEW_scrollSpeed	 = false;
-		if(%thisWP.loopsPerUnit 		!$= %otherWP.loopsPerUnit			) { %this.LEW_loopsPerUnit	 = true;	%this.LSW_loopsPerUnit	 = %thisWP.loopsPerUnit;												%WPLerps++;	 } else %this.LEW_loopsPerUnit	 = false;
-		if(%thisWP.rayCastColor 		!$= %otherWP.rayCastColor			) { %this.LEW_rayCastColor	 = true;	%this.LSW_rayCastColor	 = %thisWP.rayCastColor;												%WPLerps++;	 } else %this.LEW_rayCastColor	 = false;
+		if(%thisWP.getPosition() !$= %otherWP.getPosition()	  ) { %this.LEW_position		= true;	%this.LSW_position		 = %thisWP.getTransform(); %this.LFW_position = %otherWP.getPosition(); %WPLerps++;	 } else %this.LEW_position		 = false;
+		if(%thisWP.color 		 !$= %otherWP.color			  ) { %this.LEW_color			= true;	%this.LSW_color			 = %thisWP.color;														%WPLerps++;	 } else %this.LEW_color			 = false;
+		if(%thisWP.scrollSpeed 	 !$= %otherWP.scrollSpeed	  ) { %this.LEW_scrollSpeed		= true;	%this.LSW_scrollSpeed	 = %thisWP.scrollSpeed;													%WPLerps++;	 } else %this.LEW_scrollSpeed	 = false;
+		if(%thisWP.loopsPerUnit  !$= %otherWP.loopsPerUnit	  ) { %this.LEW_loopsPerUnit	= true;	%this.LSW_loopsPerUnit	 = %thisWP.loopsPerUnit;												%WPLerps++;	 } else %this.LEW_loopsPerUnit	 = false;
+		if(%thisWP.rayCastColor  !$= %otherWP.rayCastColor	  ) { %this.LEW_rayCastColor	= true;	%this.LSW_rayCastColor	 = %thisWP.rayCastColor;												%WPLerps++;	 } else %this.LEW_rayCastColor	 = false;
 	} else {
 		%this.LEW_position		 = false;
 		%this.LEW_color			 = false;
@@ -95,7 +102,7 @@ function Environment::initTransition(%this, %other)
 
 	if(isObject(%thisWZ) && isObject(%otherWZ))
 	{
-		if(%this.waterZone.waterColor	!$= %other.waterZone.waterColor		) { %this.LEZ_waterColor	 = true;	%this.LSZ_waterColor	= %this.waterZone.waterColor;		%WZLerps++;	 } else %this.LEZ_waterColor	 = false;
+		if(%thisWZ.waterColor !$= %otherWZ.waterColor) { %this.LEZ_waterColor = true;	%this.LSZ_waterColor = %thisWZ.waterColor;	%WZLerps++; } else %this.LEZ_waterColor	 = false;
 
 		//physicalzones overlap so im not going to bother
 		%thisWZ.setScale(%otherWZ.getScale());
@@ -105,18 +112,43 @@ function Environment::initTransition(%this, %other)
 		%this.LEZ_waterColor	= false;
 		
 		if(isObject(%thisWZ)) //%otherWZ doesnt exist if this is true
-			%this.waterZone.delete();
+			%thisWZ.delete();
 		else if(isObject(%otherWZ))
 			%this.copyWaterZoneFrom(%other);
 	}
 
-	//not sure if cloudHeight is used but im adding
-	if(%thisSky.cloudHeight[0]			!$=	%otherSky.cloudHeight[0]		) {	%this.LE_cloudHeight[0]	 = true;	%this.LS_cloudHeight[0]	= %thisSky.cloudHeight[0];			%cloudLerps++; } else %this.LE_cloudHeight[0]	 = false;
-	if(%thisSky.cloudHeight[1]			!$=	%otherSky.cloudHeight[1]		) {	%this.LE_cloudHeight[1]	 = true;	%this.LS_cloudHeight[1]	= %thisSky.cloudHeight[1];			%cloudLerps++; } else %this.LE_cloudHeight[1]	 = false;
-	if(%thisSky.cloudHeight[2]			!$=	%otherSky.cloudHeight[2]		) {	%this.LE_cloudHeight[2]	 = true;	%this.LS_cloudHeight[2]	= %thisSky.cloudHeight[2];			%cloudLerps++; } else %this.LE_cloudHeight[2]	 = false;
-	if(%thisSky.cloudSpeed[0]			!$=	%otherSky.cloudSpeed[0]			) {	%this.LE_cloudSpeed[0]	 = true;	%this.LS_cloudSpeed[0]	= %thisSky.cloudSpeed[0];			%cloudLerps++; } else %this.LE_cloudSpeed[0]	 = false;
-	if(%thisSky.cloudSpeed[1]			!$=	%otherSky.cloudSpeed[1]			) {	%this.LE_cloudSpeed[1]	 = true;	%this.LS_cloudSpeed[1]	= %thisSky.cloudSpeed[1];			%cloudLerps++; } else %this.LE_cloudSpeed[1]	 = false;
-	if(%thisSky.cloudSpeed[2]			!$=	%otherSky.cloudSpeed[2]			) {	%this.LE_cloudSpeed[2]	 = true;	%this.LS_cloudSpeed[2]	= %thisSky.cloudSpeed[2];			%cloudLerps++; } else %this.LE_cloudSpeed[2]	 = false;
+	if(isObject(%this.rain))
+	{
+		if(isObject(%other.rain))
+		{
+			%otherNumDrops = %other.rain.numDrops;
+			%thisNumDrops = %this.rain.numDrops;
+
+			//set num drops = %rain.setPercentange( numDrops / %rain.numDrops )
+			%this.LER_Percentage = 2; //enabled type 2
+			%this.LSR_Percentage = 1;
+			//need to update this at 50%
+			%this.LFR_Percentage = %otherNumDrops / %thisNumDrops;
+		} else {
+			//dimish to 0 percentage
+			%this.LER_Percentage = 1; //enabled type 1
+			%this.LSR_Percentage = 1;
+			%this.LFR_Percentage = 0;
+		}
+	} else {
+		if(isObject(%other.rain))
+		{
+			//%other rain exists, but %this does not
+			%this.copyRainFrom(%other);
+			%this.LER_Percentage = 1;
+			%this.LSR_Percentage = 0;
+			%this.LFR_Percentage = 1;
+			%this.rain.setPercentange(0);
+		} else {
+			//neither objects exist
+			%this.LER_Percentage = false;
+		}
+	}
 
 	%this.skyLerps = %skyLerps;
 	%this.sunLerps = %sunLerps;
@@ -170,8 +202,6 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	%otherSky = %other.sky;
 	%thisWP = %this.waterPlane;
 	%otherWP = %other.waterPlane;
-	%thisWZ = %this.waterZone;
-	%otherWZ = %other.waterZone;
 	%thisGP = %this.groundPlane;
 	%otherGP = %other.groundPlane;
 
@@ -255,7 +285,8 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	//waterzone
 	if(%this.waterZoneLerps > 0)
 	{
-		if(%this.LEZ_waterColor		) { %thisWZ.setWaterColor(EZ_Lerp4f(%this.LSZ_waterColor	, %other.var_UnderWaterColor, %lerp)); }
+		//underwatercolor has like 3 bits per channel & updates at weird amounts
+		if(%this.LEZ_waterColor		) { %this.waterZone.setWaterColor(EZ_Lerp4f(%this.LSZ_waterColor	, %other.waterZone.waterColor		, %lerp)); }
 	}
 
 	//cloud
@@ -270,6 +301,8 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 
 		%sendSkyUpdate = true;
 	}
+
+	if(%this.LER_Percentage		  ) { %this.rain.setPercentange(EZ_Lerp1f(%this.LSR_Percentage	 , %this.LFR_Percentage	   , %lerp));}
 
 	if(%sendGPUpdate)
 		%thisGP.sendUpdate();
@@ -318,11 +351,28 @@ function Environment::transitionPassedMidpoint(%this, %other, %lerp)
 	%this.var_WaterIdx = %other.var_WaterIdx;
 	%this.var_GroundIdx = %other.var_GroundIdx;
 
+	%otherNumDrops = %other.rain.numDrops;
+	%thisNumDrops = %this.rain.numDrops;
+
+	if(%this.LER_Percentage == 2) //type 2 is update at midpoint
+	{
+		%curNumDrops = %this.rain.numDrops * EZ_Lerp1f(%this.LSR_Percentage, %this.LFR_Percentage, %this.lastTransitionValue);
+		%this.rain.delete();
+		%this.copyRainFrom(%other);
+
+		//set num drops = %rain.setPercentange( numDrops / %rain.numDrops )
+
+		%this.LSR_Percentage = %curNumDrops / %this.rain.numDrops;
+		%this.LFR_Percentage = 1;
+	}
+
 	//will sendupdate using main function
 }
 
 function Environment::transitionEnvironmentFinal(%this, %other)
 {
+	if(isObject(%this.rain) && !isObject(%other.rain))
+		%this.rain.delete();
 }
 
 //lerping angles
