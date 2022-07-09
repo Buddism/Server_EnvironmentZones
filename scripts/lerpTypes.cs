@@ -29,8 +29,7 @@ function Environment::TimeTransition(%this, %other, %time, %start)
 		%lerp = (1 - mCos(%lerp * $PI)) / 2;
 
 	%this.transitionEnvironment(%other, %lerp);
-
-	%this.client.bottomPrint(%lerp NL %this.sun.color, 1, 1);
+	
 	if(%lerp < 1)
 		%this.transitionSchedule = %this.schedule(31, TimeTransition, %other, %time, %start);
 }

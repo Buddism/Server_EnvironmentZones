@@ -49,10 +49,10 @@ function Environment::initTransition(%this, %other)
 
 	if(%thisGP.color 			 !$= %otherGP.color			  ) { %this.LEG_color			= true;	%this.LSG_color			 =  %thisGP.color;					%GPLerps++;	 } else %this.LEG_color			 = false;
 	if(%thisGP.scrollSpeed 		 !$= %otherGP.scrollSpeed	  ) { %this.LEG_scrollSpeed	  	= true;	%this.LSG_scrollSpeed	 =  %thisGP.scrollSpeed;			%GPLerps++;	 } else %this.LEG_scrollSpeed	 = false;
-	if(%thisGP.loopsPerUnit 	 !$= %otherGP.loopsPerUnit	  ) { %this.LEG_loopsPerUnit	= true;	%this.LSG_loopsPerUnit	 =  %thisGP.loopsPerUnit;			%GPLerps++;	 } else %this.LEG_loopsPerUnit	 = false;
+	//if(%thisGP.loopsPerUnit 	 !$= %otherGP.loopsPerUnit	  ) { %this.LEG_loopsPerUnit	= true;	%this.LSG_loopsPerUnit	 =  %thisGP.loopsPerUnit;			%GPLerps++;	 } else %this.LEG_loopsPerUnit	 = false;
 	if(%thisGP.rayCastColor 	 !$= %otherGP.rayCastColor	  ) { %this.LEG_rayCastColor	= true;	%this.LSG_rayCastColor	 =  %thisGP.rayCastColor;			%GPLerps++;	 } else %this.LEG_rayCastColor	 = false;
 
-	//not sure if cloudHeight is used but im adding
+	//not sure if cloudHeight is used but im adding- yes it is used
 	if(%thisSky.cloudHeight[0]	 !$= %otherSky.cloudHeight[0] ) { %this.LE_cloudHeight[0]	= true;	%this.LS_cloudHeight[0]	 = %thisSky.cloudHeight[0];		  %cloudLerps++; } else %this.LE_cloudHeight[0]	 = false;
 	if(%thisSky.cloudHeight[1]	 !$= %otherSky.cloudHeight[1] ) { %this.LE_cloudHeight[1]	= true;	%this.LS_cloudHeight[1]	 = %thisSky.cloudHeight[1];		  %cloudLerps++; } else %this.LE_cloudHeight[1]	 = false;
 	if(%thisSky.cloudHeight[2]	 !$= %otherSky.cloudHeight[2] ) { %this.LE_cloudHeight[2]	= true;	%this.LS_cloudHeight[2]	 = %thisSky.cloudHeight[2];		  %cloudLerps++; } else %this.LE_cloudHeight[2]	 = false;
@@ -65,13 +65,13 @@ function Environment::initTransition(%this, %other)
 		if(%thisWP.getPosition() !$= %otherWP.getPosition()	  ) { %this.LEW_position		= true;	%this.LSW_position		 = %thisWP.getTransform(); %this.LFW_position = %otherWP.getPosition(); %WPLerps++;	 } else %this.LEW_position		 = false;
 		if(%thisWP.color 		 !$= %otherWP.color			  ) { %this.LEW_color			= true;	%this.LSW_color			 = %thisWP.color;														%WPLerps++;	 } else %this.LEW_color			 = false;
 		if(%thisWP.scrollSpeed 	 !$= %otherWP.scrollSpeed	  ) { %this.LEW_scrollSpeed		= true;	%this.LSW_scrollSpeed	 = %thisWP.scrollSpeed;													%WPLerps++;	 } else %this.LEW_scrollSpeed	 = false;
-		if(%thisWP.loopsPerUnit  !$= %otherWP.loopsPerUnit	  ) { %this.LEW_loopsPerUnit	= true;	%this.LSW_loopsPerUnit	 = %thisWP.loopsPerUnit;												%WPLerps++;	 } else %this.LEW_loopsPerUnit	 = false;
+		//if(%thisWP.loopsPerUnit  !$= %otherWP.loopsPerUnit	  ) { %this.LEW_loopsPerUnit	= true;	%this.LSW_loopsPerUnit	 = %thisWP.loopsPerUnit;												%WPLerps++;	 } else %this.LEW_loopsPerUnit	 = false;
 		if(%thisWP.rayCastColor  !$= %otherWP.rayCastColor	  ) { %this.LEW_rayCastColor	= true;	%this.LSW_rayCastColor	 = %thisWP.rayCastColor;												%WPLerps++;	 } else %this.LEW_rayCastColor	 = false;
 	} else {
 		%this.LEW_position		 = false;
 		%this.LEW_color			 = false;
 		%this.LEW_scrollSpeed	 = false;
-		%this.LEW_loopsPerUnit	 = false;
+		//%this.LEW_loopsPerUnit	 = false;
 		%this.LEW_rayCastColor	 = false;
 
 		if(isObject(%thisWP) && !isObject(%otherWP))
@@ -183,6 +183,8 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 		return;
 
 	%lerp = mClampF(%lerp, 0, 1);
+	%this.client.bottomPrint(%lerp, 1, 1);
+
 	if(%lerp >= 0.5 && %this.lastTransitionValue < 0.5)
 	{
 		%this.transitionPassedMidpoint(%other, %lerp);
@@ -258,7 +260,7 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	{
 		if(%this.LEG_color			) { %thisGP.color 		 = EZ_Lerp4i(%this.LSG_color		, %otherGP.color		 , %lerp ); }
 		if(%this.LEG_scrollSpeed	) { %thisGP.scrollSpeed  = EZ_Lerp2f(%this.LSG_scrollSpeed	, %otherGP.scrollSpeed	 , %lerp ); }
-		if(%this.LEG_loopsPerUnit	) { %thisGP.loopsPerUnit = EZ_Lerp1f(%this.LSG_loopsPerUnit	, %otherGP.loopsPerUnit	 , %lerp ); }
+		//if(%this.LEG_loopsPerUnit	) { %thisGP.loopsPerUnit = EZ_Lerp1f(%this.LSG_loopsPerUnit	, %otherGP.loopsPerUnit	 , %lerp ); }
 		if(%this.LEG_rayCastColor	) { %thisGP.rayCastColor = EZ_Lerp1f(%this.LSG_rayCastColor	, %otherGP.rayCastColor	 , %lerp ); }
 
 		%thisGP.blend = getWord (%thisGP.color, 3) < 255;
@@ -274,7 +276,7 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 		if(%this.LEW_position		) { %thisWP.setTransform  (EZ_Lerp3f(%this.LSW_position		, %this.LFW_position	 , %lerp ) SPC getWords(%this.LSW_position, 3, 6));	}
 		if(%this.LEW_color			) { %thisWP.color 		 = EZ_Lerp4i(%this.LSW_color		, %otherWP.color		 , %lerp ); 										}
 		if(%this.LEW_scrollSpeed	) { %thisWP.scrollSpeed  = EZ_Lerp2f(%this.LSW_scrollSpeed	, %otherWP.scrollSpeed	 , %lerp ); 										}
-		if(%this.LEW_loopsPerUnit	) { %thisWP.loopsPerUnit = EZ_Lerp1f(%this.LSW_loopsPerUnit	, %otherWP.loopsPerUnit	 , %lerp ); 										}
+		//if(%this.LEW_loopsPerUnit	) { %thisWP.loopsPerUnit = EZ_Lerp1f(%this.LSW_loopsPerUnit	, %otherWP.loopsPerUnit	 , %lerp ); 										}
 		if(%this.LEW_rayCastColor	) { %thisWP.rayCastColor = EZ_Lerp1f(%this.LSW_rayCastColor	, %otherWP.rayCastColor	 , %lerp ); 										}
 
 		%thisWP.blend = getWord (%thisWP.color, 3) < 255;
@@ -345,6 +347,9 @@ function Environment::transitionPassedMidpoint(%this, %other, %lerp)
 	%thisSky.noRenderBans		 = %otherSky.noRenderBan;
 	%thisSky.materialList		 = %otherSky.materialList;
 
+	%thisGP.loopsPerUnit = %otherGP.loopsPerUnit;
+	%thisWP.loopsPerUnit = %otherWP.loopsPerUnit;
+
 	%this.SunLight.setFlareBitmaps (%other.sunLight.remoteFlareBitmap, %other.sunLight.localFlareBitmap);
 	
 	if(%this.var_SkyIdx !$= %other.var_SkyIdx && isObject(%other.rain))
@@ -352,7 +357,7 @@ function Environment::transitionPassedMidpoint(%this, %other, %lerp)
 		%this.rain.delete();
 		%this.copyRainFrom(%other);
 	}
-	
+
 	%this.var_SkyIdx = %other.var_SkyIdx;
 	%this.var_WaterIdx = %other.var_WaterIdx;
 	%this.var_GroundIdx = %other.var_GroundIdx;
