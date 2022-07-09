@@ -347,6 +347,12 @@ function Environment::transitionPassedMidpoint(%this, %other, %lerp)
 
 	%this.SunLight.setFlareBitmaps (%other.sunLight.remoteFlareBitmap, %other.sunLight.localFlareBitmap);
 	
+	if(%this.var_SkyIdx !$= %other.var_SkyIdx && isObject(%other.rain))
+	{
+		%this.rain.delete();
+		%this.copyRainFrom(%other);
+	}
+	
 	%this.var_SkyIdx = %other.var_SkyIdx;
 	%this.var_WaterIdx = %other.var_WaterIdx;
 	%this.var_GroundIdx = %other.var_GroundIdx;

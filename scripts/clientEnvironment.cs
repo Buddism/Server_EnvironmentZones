@@ -121,12 +121,6 @@ function Environment::setClientEnv(%this, %other)
 	if(!isObject(%this.dayCycle))
 		%this.copyDayCycleFrom(%other);
 
-	if(isObject (%this.Rain))
-		%this.Rain.delete ();
-		
-	if(isObject(%other.rain))
-		%this.copyRainFrom(%other);
-
 	//im just gonna ignore this (skybox handles it instead?)
 	//loadDayCycle ($EnvGuiServer::DayCycle[%other.var_DayCycleIdx]);
 
@@ -295,6 +289,12 @@ function Environment::setSkyBox (%this, %other, %noUpdate)
 		%thisSky.sendUpdate ();
 		%thisSun.sendUpdate ();
 	}
+
+	if(isObject (%this.Rain))
+		%this.Rain.delete ();
+		
+	if(isObject(%other.rain))
+		%this.copyRainFrom(%other);
 
 	%this.loadDayCycle(%other, %noUpdate);
 
