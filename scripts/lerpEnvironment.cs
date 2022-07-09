@@ -153,7 +153,7 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 	%lerp = mClampF(%lerp, 0, 1);
 	if(%lerp >= 0.5 && %this.lastTransitionValue < 0.5)
 	{
-		%this.lerpPassedMidpoint(%other, %lerp);
+		%this.transitionPassedMidpoint(%other, %lerp);
 		%sendSkyUpdate = true;
 
 	} else if(%lerp >= 1.0 && %this.lastTransitionValue < 1)
@@ -284,7 +284,7 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 }
 
 
-function Environment::lerpPassedMidpoint(%this, %other, %lerp)
+function Environment::transitionPassedMidpoint(%this, %other, %lerp)
 {
 	if(!isObject(%other))
 		return;
