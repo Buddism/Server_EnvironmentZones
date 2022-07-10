@@ -158,6 +158,16 @@ function Environment::initTransition(%this, %other)
 	%this.cloudLerps = %cloudLerps;
 	%this.groundLerps = %GPLerps;
 
+	//talk(%thisSky.fogVolume1 @"//"@ %otherSky.fogVolume1);
+	//talk(%this.client.name);
+	// talk("skyLerps" SPC %this.skyLerps);
+	// talk("sunLerps" SPC %this.sunLerps);
+	// talk("sunlightLerps" SPC %this.sunlightLerps);
+	// talk("WaterZoneLerps" SPC %this.WaterZoneLerps);
+	// talk("WaterPlaneLerps" SPC %this.WaterPlaneLerps);
+	// talk("cloudLerps" SPC %this.cloudLerps);
+	// talk("groundLerps" SPC %this.groundLerps);
+
 	%totalLerps = %skyLerps + %sunLerps + %sunLight + %WZLerps + %WPLerps + %cloudLerps + %GPLerps;
 	if(%totalLerps == 0)
 		return false;
@@ -350,7 +360,7 @@ function Environment::transitionPassedMidpoint(%this, %other, %lerp)
 	%thisGP.loopsPerUnit = %otherGP.loopsPerUnit;
 	%thisWP.loopsPerUnit = %otherWP.loopsPerUnit;
 
-	%this.SunLight.setFlareBitmaps (%other.sunLight.remoteFlareBitmap, %other.sunLight.localFlareBitmap);
+	%this.SunLight.setFlareBitmaps (%other.sunLight.localFlareBitmap, %other.sunLight.remoteFlareBitmap);
 	
 	if(%this.var_SkyIdx !$= %other.var_SkyIdx && isObject(%other.rain))
 	{

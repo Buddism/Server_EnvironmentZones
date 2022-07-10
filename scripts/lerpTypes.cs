@@ -31,5 +31,10 @@ function Environment::TimeTransition(%this, %other, %time, %start)
 	%this.transitionEnvironment(%other, %lerp);
 	
 	if(%lerp < 1)
-		%this.transitionSchedule = %this.schedule(31, TimeTransition, %other, %time, %start);
+		%this.transitionSchedule = %this.schedule(100, TimeTransition, %other, %time, %start);
+}
+
+function Environment::squareTransition(%this, %other)
+{
+
 }

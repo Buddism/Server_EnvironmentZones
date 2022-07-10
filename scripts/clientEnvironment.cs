@@ -34,7 +34,7 @@ function Environment::setClientEnv(%this, %other)
 	{
 		%this.sunLight.FlareSize = %other.sunLight.FlareSize;
 		%this.sunLight.color 	 = %other.sunLight.color;
-		%this.SunLight.setFlareBitmaps (%other.sunLight.remoteFlareBitmap, %other.sunLight.localFlareBitmap);
+		%this.SunLight.setFlareBitmaps (%other.sunLight.localFlareBitmap, %other.sunLight.remoteFlareBitmap);
 
 		%updateSunLight = true;
 	} else {
@@ -50,6 +50,7 @@ function Environment::setClientEnv(%this, %other)
 		%thisSky.skyColor				  = %otherSky.skyColor;
 		%thisSky.windVelocity			  = %otherSky.windVelocity;
 		%thisSky.windEffectPrecipitation  = %otherSky.windEffectPrecipitation;
+		%thisSky.fogVolume1				  = %otherSky.fogVolume1;
 
 		%updateSky = true;
 	} else {
@@ -78,10 +79,7 @@ function Environment::setClientEnv(%this, %other)
 			%thisWP.scrollSpeed	 = %thisWP.scrollSpeed;
 			%thisWP.color 		 = %thisWP.color;
 			%thisWP.blend 		 = %thisWP.blend;
-		
-			%thisSky.fogVolume1  = %otherSky.fogVolume1;
 
-			%updateSky = true;
 			%updateWP = true;
 		} else {
 			%this.copyWaterPlaneFrom(%other);
@@ -280,7 +278,7 @@ function Environment::setSkyBox (%this, %other, %noUpdate)
 	%thisSun.ambient = %otherSun.ambient;
 	%thisSun.shadowColor = %otherSun.shadowColor;
 
-	%this.SunLight.setFlareBitmaps (%other.sunLight.remoteFlareBitmap, %other.sunLight.localFlareBitmap);
+	%this.SunLight.setFlareBitmaps (%other.sunLight.localFlareBitmap, %other.sunLight.remoteFlareBitmap);
 	%this.SunLight.FlareSize = %other.SunLight.FlareSize;
 	%this.SunLight.color = %other.SunLight.color;
 
@@ -619,7 +617,7 @@ function Environment::SetVar(%this, %varName, %value, %other)
 					%this.WaterPlane.blend = getWord (%this.WaterPlane.color, 3) < 255;
 					%this.WaterPlane.sendUpdate ();
 					
-					%waterVis = 220 - getWord ($EnvGuiServer::WaterColor, 3) * 200;
+					%waterVis = 220 - getWord (%this.WaterPlane.color, 3) * 200;
 					%this.Sky.fogVolume1 = %waterVis SPC -10 SPC %height;
 					%this.Sky.sendUpdate ();
 				}
@@ -635,7 +633,8 @@ function Environment::SetVar(%this, %varName, %value, %other)
 					%this.WaterPlane.setTransform (%pos @ " 0 0 1 0");
 					%this.WaterPlane.sendUpdate ();
 					%height = getWord (%this.WaterPlane.getTransform (), 2);
-					%waterVis = 220 - getWord ($EnvGuiServer::WaterColor, 3) * 200;
+
+					%waterVis = 220 - getWord (%this.WaterPlane.color, 3) * 200;
 					%this.Sky.fogVolume1 = %waterVis SPC -10 SPC %height;
 					%this.Sky.sendUpdate ();
 				}
