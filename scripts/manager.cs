@@ -58,6 +58,9 @@ function exportEnvironmentZones(%filename)
 			%file.writeLine("WindVelocity" TAB %env.var_WindVelocity);
 			%file.writeLine("SimpleVignetteColor" TAB %env.simple_VignetteColor);
 			%file.writeLine("SimpleVignetteMultiply" TAB %env.simple_VignetteMultiply);
+
+
+			%file.writeLine("fogVolume1" TAB %env.sky.fogVolume1);
 		}
 
 		%file.writeLine("");
@@ -152,6 +155,10 @@ function loadEnvironmentZones(%filename)
 				case "File_SunFlareTop":
 					%var = "SunFlareTopIdx";
 					%value = getEnvironmentFileIdx("SunFlare", %value);
+
+				case "fogVolume1":
+					%zone.sky.fogVolume1 = %value;
+					continue;
 			}
 
 			setEnvVariable(%var, %value);
