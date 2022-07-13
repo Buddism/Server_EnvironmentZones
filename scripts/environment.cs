@@ -599,7 +599,7 @@ function GameConnection::setEnvironment(%this, %zoneEnvironment)
 	%this.currentEnvironment.zoneEnvironment = %zoneEnvironment;
 
 	//%this.currentEnvironment.setClientEnv(%zoneEnvironment);
-	%this.currentEnvironment.TimeTransition(%zoneEnvironment, 1000 + $delay);
+	%this.currentEnvironment.TimeTransition(%zoneEnvironment, 1000); //1000 ms
 	%this.currentEnvironment.scopeToClient(%this);
 	//EnvGuiServer::sendVignette(%this);
 }

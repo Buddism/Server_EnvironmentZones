@@ -193,8 +193,7 @@ function Environment::transitionEnvironment(%this, %other, %lerp)
 		return;
 
 	%lerp = mClampF(%lerp, 0, 1);
-	%this.client.bottomPrint(%lerp, 1, 1);
-
+	
 	if(%lerp >= 0.5 && %this.lastTransitionValue < 0.5)
 	{
 		%this.transitionPassedMidpoint(%other, %lerp);
