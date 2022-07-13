@@ -157,7 +157,7 @@ function loadEnvironmentZones(%filename)
 					%value = getEnvironmentFileIdx("SunFlare", %value);
 
 				case "fogVolume1":
-					%zone.sky.fogVolume1 = %value;
+					%zone.environment.sky.fogVolume1 = %value;
 					continue;
 			}
 
