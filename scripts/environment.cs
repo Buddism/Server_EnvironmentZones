@@ -576,6 +576,9 @@ function GameConnection::copyEnvironmentDelay(%this, %environment)
 
 function GameConnection::setEnvironment(%this, %zoneEnvironment)
 {
+	if(isObject($DefaultEnvironment.waterZone))
+		$DefaultEnvironment.waterZone.scopeToClient(%this);
+		
 	//is their current environment a clientEnv and not a zoneEnv
 	if(isObject(%this.currentEnvironment) && !%this.currentEnvironment.isClientEnv)
 	{
