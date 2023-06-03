@@ -167,6 +167,8 @@ function loadEnvironmentZones(%filename)
 		%zone.environment.postEditCheck();
 	}
 
+	EnvGuiServer::sendVignetteAll();
+
 	%file.delete();
 	return true;
 }
@@ -290,7 +292,7 @@ package EnvironmentZones
 			return;
 
 
-		if(!isObject(%client.currentEnvironment) || %client.currentEnvironment.zoneEnvironment.getId() == $CurrentEnvironment)
+		if(!isObject(%client.currentEnvironment) || (isObject(%client.currentEnvironment.zoneEnvironment) && %client.currentEnvironment.zoneEnvironment.getId() == $CurrentEnvironment))
 		{
 			if($EnvGuiServer::SimpleMode)
 				commandToClient(%client, 'setVignette', $Sky::VignetteMultiply, $Sky::VignetteColor);

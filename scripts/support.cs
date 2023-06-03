@@ -56,7 +56,7 @@ function setEnvVariable(%varName, %value)
 	case "DayCycleIdx":
 		$EnvGuiServer::DayCycleIdx = mClamp(%value, 0, $EnvGuiServer::DayCycleCount);
 		%dayCycle = $EnvGuiServer::DayCycle[$EnvGuiServer::DayCycleIdx];
-		echo("server setting daycycle to " @ %dayCycle);
+		//echo("server setting daycycle to " @ %dayCycle);
 		loadDayCycle(%dayCycle);
 
 	case "SunAzimuth":
@@ -242,11 +242,9 @@ function setEnvVariable(%varName, %value)
 
 	case "VignetteMultiply":
 		$EnvGuiServer::VignetteMultiply = mClamp(%value, 0, 1);
-		EnvGuiServer::sendVignetteAll();
 
 	case "VignetteColor":
 		$EnvGuiServer::VignetteColor = getColorF(%value);
-		EnvGuiServer::sendVignetteAll();
 
 	default:
 		return 0;

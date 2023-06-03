@@ -467,9 +467,22 @@ function Environment::copyRainFrom(%this, %other)
 	%this.rain.scopeToClient(%this.client);
 }
 
+function Environment::SendVignetteAll(%this)
+{
+	%count = ClientGroup.getCount();
+	for (%i = 0; %i < %count; %i++)
+	{
+		%client = ClientGroup.getObject(%i);
+		%clientEnv = %client.currentEnvironment;
+
+		if(%clientEnv.zoneEnvironment == %this)
+			EnvGuiServer::SendVignette(%client);
+	}
+}
+
 //returns if you should clone the object or not
 //meant to replace serverCmdEnvGui_SetVar (%client, %varName, %value)
-//function created by Badspot, decompiled from the DSOs, then cleaned-up by Electrk (laggy webpage: https://github.com/Electrk/bl-decompiled/blob/master/server/scripts/allGameScripts.cs#L27691)
+//function created by Badspot, decompiled from the DSOs, then cleaned-up by Electrk, then modified for my use (laggy webpage: https://github.com/Electrk/bl-decompiled/blob/master/server/scripts/allGameScripts.cs#L27691)
 function Environment::SetVar(%this, %varName, %value, %other)
 {
 	switch$(%varName)
@@ -733,13 +746,13 @@ function Environment::SetVar(%this, %varName, %value, %other)
 			if(%this.var_VignetteMultiply !$= %value)
 			{
 				%this.var_VignetteMultiply = mClamp (%value, 0, 1);
-				EnvGuiServer::SendVignetteAll ();
+				%this.SendVignetteAll ();
 			}
 		case "VignetteColor":
 			if(%this.var_VignetteColor !$= %value)
 			{
 				%this.var_VignetteColor = getColorF (%value);
-				EnvGuiServer::SendVignetteAll ();
+				%this.SendVignetteAll ();
 			}
 	}
 	
