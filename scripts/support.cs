@@ -81,7 +81,7 @@ function setEnvVariable(%varName, %value)
 
 	case "ShadowColor":
 		$EnvGuiServer::ShadowColor = getColorF(%value);
-		Sun.shadowColor = $EnvGuiServer::DirectLightColor;
+		Sun.shadowColor = $EnvGuiServer::ShadowColor;
 		Sun.sendUpdate();
 
 	case "SunFlareColor":
